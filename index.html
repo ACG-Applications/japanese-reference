@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <meta name="theme-color" content="#2d6a4f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>日本語リファレンス - Japanese Reference</title>
+    <link rel="manifest" href="manifest.json" />
+    <style>
+        /* ─── RESET & BASE ─── */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+            background: #f7f5f0;
+            color: #000000;
+            padding: 1.5rem;
+            padding-top: 110px;
+            max-width: 1400px;
+            margin: 0 auto;
+            font-weight: 500;
+        }
+
+        /* ─── STICKY HEADER ─── */
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #f7f5f0;
+            padding: 0.5rem 1.5rem 0.8rem 1.5rem;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .sticky-header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.4rem;
+            color: #000000;
+        }
+        .top-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4rem 0.8rem;
+            background: #e8e4dc;
+            padding: 0.3rem 1rem 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .top-controls label {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: #000000;
+        }
+        .top-controls input[type="checkbox"] {
+            width: 30px;
+            height: 16px;
+            appearance: none;
+            background: #b0aaa0;
+            border-radius: 40px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .top-controls input[type="checkbox"]::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .top-controls input[type="checkbox"]:checked {
+            background: #2d6a4f;
+        }
+        .top-controls input[type="checkbox"]:checked::before {
+            left: 16px;
+        }
+        .top-controls .badge {
+            font-size: 0.65rem;
+            opacity: 0.7;
+            font-weight: 600;
+            color: #000000;
+        }
+        .top-controls .divider {
+            width: 1px;
+            height: 18px;
+            background: #bbb4a8;
+        }
+        .btn-tts,
+        .btn-quiz,
+        .btn-translation,
+        .btn-reset,
+        .btn-focus {
+            border: none;
+            border-radius: 30px;
+            padding: 0.12rem 0.7rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: inherit;
+            color: white;
+        }
+        .btn-tts {
+            background: #2d6a4f;
+        }
+        .btn-tts:hover {
+            background: #1e4d38;
+        }
+        .btn-tts.off {
+            background: #b0aaa0;
+        }
+        .btn-quiz {
+            background: #b9770e;
+        }
+        .btn-quiz:hover {
+            background: #9a640c;
+        }
+        .btn-quiz.active {
+            background: #c92a2a;
+        }
+        .btn-translation {
+            background: #1e6f9f;
+        }
+        .btn-translation:hover {
+            background: #155a80;
+        }
+        .btn-translation.off {
+            background: #b0aaa0;
+        }
+        .btn-reset {
+            background: #6c757d;
+        }
+        .btn-reset:hover {
+            background: #5a6268;
+        }
+        .btn-focus {
+            background: #7b2fbe;
+        }
+        .btn-focus:hover {
+            background: #6228a3;
+        }
+        .btn-focus.active {
+            background: #c92a2a;
+        }
+
+        /* ─── FOCUS MODE ─── */
+        .focus-mode .tabs,
+        .focus-mode .sheet h2,
+        .focus-mode .sheet .sub,
+        .focus-mode .sheet h3,
+        .focus-mode .sheet table {
+            display: none !important;
+        }
+        .focus-mode .sheet {
+            padding: 0.5rem 0 !important;
+            box-shadow: none !important;
+        }
+        .focus-mode .sentence-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        /* ─── TABS ─── */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.2rem;
+            margin: 0.6rem 0 0 0;
+            border-bottom: 2px solid #d6d0c6;
+            padding-bottom: 0.2rem;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #5a554c;
+            border-radius: 30px 30px 0 0;
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: inherit;
+        }
+        .tab-btn:hover {
+            background: #e8e4dc;
+        }
+        .tab-btn.active {
+            background: #2d6a4f;
+            color: white;
+        }
+        .tab-btn .en {
+            font-weight: 500;
+            font-size: 0.6rem;
+            opacity: 0.7;
+            display: block;
+            margin-top: -0.1rem;
+        }
+        .tab-btn.active .en {
+            opacity: 0.9;
+        }
+
+        /* ─── SHEETS ─── */
+        .sheet {
+            display: none;
+            background: #ffffff;
+            border-radius: 0 0 16px 16px;
+            padding: 1.5rem 1.5rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            margin-top: 0;
+            overflow-x: auto;
+        }
+        .sheet.active {
+            display: block;
+        }
+        .sheet h2 {
+            font-size: 1.4rem;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            font-weight: 700;
+            color: #000000;
+        }
+        .sheet .sub {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #4a453c;
+        }
+        .sheet h3 {
+            margin-top: 1rem;
+            margin-bottom: 0.3rem;
+            font-size: 1.1rem;
+            color: #000000;
+            font-weight: 700;
+        }
+
+        /* ─── TABLES ─── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.5rem 0 1rem 0;
+            font-size: 0.95rem;
+            font-weight: 500;
+            background: #ffffff;
+            color: #000000;
+        }
+        th,
+        td {
+            border: 1px solid #ddd6cc;
+            padding: 0.4rem 0.6rem;
+            text-align: center;
+            vertical-align: middle;
+            min-width: 35px;
+            font-weight: 500;
+            color: #000000;
+            background: #ffffff;
+        }
+        th {
+            background: #ede9e1;
+            font-weight: 700;
+            color: #000000;
+        }
+        tr:nth-child(even) td {
+            background: #faf8f5;
+        }
+
+        /* ─── RUBY (FIXED!) ─── */
+        /* Furigana ON - proper ruby rendering */
+        ruby {
+            display: inline-block;
+            ruby-align: center;
+            vertical-align: middle;
+            line-height: 1.4;
+        }
+        rt {
+            display: block;
+            font-size: 0.55rem;
+            line-height: 1;
+            letter-spacing: 0.3px;
+            color: #2d6a4f;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 0.1rem;
+        }
+        /* Ensure kanji is below furigana */
+        ruby .kanji {
+            display: inline-block;
+            line-height: 1.4;
+        }
+
+        /* Furigana OFF - completely hide ruby */
+        .no-furigana ruby {
+            display: inline !important;
+            ruby-align: unset !important;
+        }
+        .no-furigana rt {
+            display: none !important;
+        }
+        .no-furigana ruby .kanji {
+            display: inline !important;
+        }
+
+        /* ─── TRANSLATION TOGGLE ─── */
+        .no-translation .en,
+        .no-translation .en-label {
+            display: none !important;
+        }
+        .no-translation .sentence-item .en {
+            display: none !important;
+        }
+        .no-translation .sentence-item .label {
+            display: none !important;
+        }
+
+        /* ─── SENTENCES ─── */
+        .sentence-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 0.6rem 1rem;
+            margin-top: 0.5rem;
+        }
+        .sentence-item {
+            background: #ffffff;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            border-left: 4px solid #2d6a4f;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+        .sentence-item .jp {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            font-weight: 600;
+            color: #000000;
+        }
+        .sentence-item .en {
+            font-size: 0.9rem;
+            color: #4a453c;
+            font-weight: 500;
+        }
+        .sentence-item .label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #2d6a4f;
+            font-weight: 700;
+        }
+        .sentence-item .tts-btn {
+            position: absolute;
+            top: 0.4rem;
+            right: 0.6rem;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: 0.15s;
+            padding: 0 0.2rem;
+        }
+        .sentence-item .tts-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* ─── QUIZ MODE ─── */
+        .quiz-mode .sentence-item .jp {
+            cursor: pointer;
+        }
+        .quiz-input {
+            display: inline-block;
+            border: none;
+            border-bottom: 2px solid #2d6a4f;
+            background: #ffffff;
+            font-size: 1.1rem;
+            font-family: inherit;
+            width: 100px;
+            padding: 0 0.2rem;
+            outline: none;
+            transition: 0.15s;
+            color: #000000;
+            font-weight: 600;
+        }
+        .quiz-input:focus {
+            border-bottom-color: #b9770e;
+        }
+        .quiz-input.correct {
+            border-bottom-color: #2d6a4f;
+            background: #d4edda;
+        }
+        .quiz-input.incorrect {
+            border-bottom-color: #c92a2a;
+            background: #f8d7da;
+        }
+        .quiz-check-btn {
+            background: #2d6a4f;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 0.1rem 0.7rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-family: inherit;
+            margin-left: 0.3rem;
+            transition: 0.15s;
+            font-weight: 700;
+        }
+        .quiz-check-btn:hover {
+            background: #1e4d38;
+        }
+        .quiz-result {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-left: 0.4rem;
+        }
+        .quiz-result.correct {
+            color: #2d6a4f;
+        }
+        .quiz-result.incorrect {
+            color: #c92a2a;
+        }
+
+        /* ─── EXPRESSION TABLE ─── */
+        .expr-table td:first-child {
+            font-weight: 600;
+            text-align: left;
+        }
+        .expr-table td:last-child {
+            text-align: left;
+            font-weight: 500;
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 700px) {
+            body {
+                padding: 0.5rem;
+                padding-top: 120px;
+            }
+            .sticky-header {
+                padding: 0.3rem 0.5rem 0.5rem 0.5rem;
+            }
+            h1 {
+                font-size: 1rem;
+                gap: 0.3rem;
+            }
+            .top-controls {
+                font-size: 0.6rem;
+                padding: 0.2rem 0.5rem;
+                gap: 0.2rem 0.4rem;
+                border-radius: 20px;
+            }
+            .top-controls input[type="checkbox"] {
+                width: 22px;
+                height: 13px;
+            }
+            .top-controls input[type="checkbox"]::before {
+                width: 9px;
+                height: 9px;
+            }
+            .top-controls input[type="checkbox"]:checked::before {
+                left: 11px;
+            }
+            .top-controls .divider {
+                height: 12px;
+            }
+            .btn-tts,
+            .btn-quiz,
+            .btn-translation,
+            .btn-reset,
+            .btn-focus {
+                font-size: 0.55rem;
+                padding: 0.1rem 0.4rem;
+            }
+            .tab-btn {
+                padding: 0.2rem 0.6rem;
+                font-size: 0.65rem;
+            }
+            .tab-btn .en {
+                font-size: 0.5rem;
+            }
+            .sheet {
+                padding: 0.7rem;
+            }
+            .sheet h2 {
+                font-size: 1.1rem;
+            }
+            table {
+                font-size: 0.7rem;
+            }
+            th,
+            td {
+                padding: 0.2rem 0.25rem;
+                min-width: 22px;
+            }
+            .sentence-grid {
+                grid-template-columns: 1fr;
+            }
+            .sentence-item .jp {
+                font-size: 1.1rem;
+            }
+            .quiz-input {
+                width: 70px;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media print {
+            .sticky-header {
+                position: static !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+            body {
+                padding-top: 0 !important;
+            }
+            .top-controls {
+                display: none;
+            }
+            .tab-btn {
+                display: none;
+            }
+            .sheet {
+                display: block !important;
+                box-shadow: none;
+                padding: 0.3rem 0;
+                border-bottom: 2px solid #ccc;
+                page-break-after: always;
+            }
+            .sheet:last-child {
+                border-bottom: none;
+                page-break-after: avoid;
+            }
+            .sentence-item .tts-btn {
+                display: none;
+            }
+            .quiz-check-btn,
+            .quiz-input,
+            .quiz-result,
+            .quiz-score {
+                display: none !important;
+            }
+            .no-furigana rt {
+                display: block !important;
+            }
+            .no-furigana ruby {
+                display: inline-block !important;
+                ruby-align: center !important;
+            }
+            .focus-mode .tabs,
+            .focus-mode .sheet h2,
+            .focus-mode .sheet .sub,
+            .focus-mode .sheet h3,
+            .focus-mode .sheet table {
+                display: block !important;
+            }
+            .focus-mode .sheet {
+                padding: 0.5rem 0 !important;
+            }
+            .focus-mode .sentence-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ════════════════════════════════════════════════════ -->
+    <!-- STICKY HEADER                                      -->
+    <!-- ════════════════════════════════════════════════════ -->
+    <header class="sticky-header">
+        <div class="sticky-header-inner">
+            <h1>
+                <span>🇯🇵 日本語リファレンス</span>
+                <span class="top-controls">
+                    <label>
+                        <span>ふりがな</span>
+                        <input type="checkbox" id="furiganaToggle" checked />
+                    </label>
+                    <span class="divider"></span>
+                    <button class="btn-translation" id="translationToggle">🌐 訳</button>
+                    <button class="btn-tts" id="ttsToggle">🔊 TTS</button>
+                    <button class="btn-quiz" id="quizToggle">📝 Quiz</button>
+                    <button class="btn-focus" id="focusToggle">🎯 Focus</button>
+                    <button class="btn-reset" id="resetButton">🔄 Reset</button>
+                    <span class="badge" id="scoreDisplay"></span>
+                </span>
+            </h1>
+        </div>
+    </header>
+
+    <!-- ─── TABS ─── -->
+    <div class="tabs" id="tabContainer">
+        <button class="tab-btn active" data-tab="counters">カウンター<span class="en">Counters</span></button>
+        <button class="tab-btn" data-tab="frequency">頻度<span class="en">Frequency</span></button>
+        <button class="tab-btn" data-tab="numbers">数字<span class="en">Numbers</span></button>
+        <button class="tab-btn" data-tab="calendar">カレンダー<span class="en">Calendar</span></button>
+        <button class="tab-btn" data-tab="months">月・週・年<span class="en">Months / Weeks / Years</span></button>
+        <button class="tab-btn" data-tab="time">時間<span class="en">Time</span></button>
+        <button class="tab-btn" data-tab="duration">時間・場所・量<span class="en">Duration / Location / Quantity</span></button>
+        <button class="tab-btn" data-tab="directions">方向・場所<span class="en">Directions &amp; Locations</span></button>
+        <button class="tab-btn" data-tab="classroom1">教室 1<span class="en">Classroom Vocab</span></button>
+        <button class="tab-btn" data-tab="classroom2">教室 2<span class="en">Classroom Expressions</span></button>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════ -->
+    <!-- SHEETS (dynamically generated by JavaScript)       -->
+    <!-- ════════════════════════════════════════════════════ -->
+    <div id="sheetsContainer"></div>
+
+    <!-- ════════════════════════════════════════════════════ -->
+    <!-- SCRIPT                                             -->
+    <!-- ════════════════════════════════════════════════════ -->
+    <script>
+        // ──────────────────────────────────────────────────────
+        // 1. DATA — All sheets and sentences
+        // ──────────────────────────────────────────────────────
+
+        const sheetData = {
+
+            counters: {
+                title: 'カウンター',
+                subtitle: '～つ / ～こ / ～にん / ～さつ / ～ほん / ～まい / ～さい',
+                table: {
+                    headers: ['#', '～つ', '～こ', '～にん', '～さつ', '～ほん', '～まい', '～さい'],
+                    rows: [
+                        ['1', 'ひとつ', 'いっこ', 'ひとり', 'いっさつ', 'いっぽん', 'いちまい', 'いっさい'],
+                        ['2', 'ふたつ', 'にこ', 'ふたり', 'にさつ', 'にほん', 'にまい', 'にさい'],
+                        ['3', 'みっつ', 'さんこ', 'さんにん', 'さんさつ', 'さんぼん', 'さんまい', 'さんさい'],
+                        ['4', 'よっつ', 'よんこ', 'よにん', 'よんさつ', 'よんほん', 'よんまい', 'よんさい'],
+                        ['5', 'いつつ', 'ごこ', 'ごにん', 'ごさつ', 'ごほん', 'ごまい', 'ごさい'],
+                        ['6', 'むっつ', 'ろっこ', 'ろくにん', 'ろくさつ', 'ろっぽん', 'ろくまい', 'ろくさい'],
+                        ['7', 'ななつ', 'ななこ', 'ななにん', 'ななさつ', 'ななほん', 'ななまい', 'ななさい'],
+                        ['8', 'やっつ', 'はっこ', 'はちにん', 'はっさつ', 'はっぽん', 'はちまい', 'はっさい'],
+                        ['9', 'ここのつ', 'きゅうこ', 'きゅうにん', 'きゅうさつ', 'きゅうほん', 'きゅうまい', 'きゅうさい'],
+                        ['10', 'とお', 'じゅっこ', 'じゅうにん', 'じゅっさつ', 'じゅっぽん', 'じゅうまい', 'じゅっさい']
+                    ]
+                },
+                sentences: [
+                    { label: '～つ', jp: '<ruby>林檎<rt>りんご</rt></ruby>が<ruby>１<rt>ひと</rt></ruby>つあります。', en: 'There is 1 apple.',
+                        answer: 'ひとつ', tts: 'りんごがひとつあります。' },
+                    { label: '～こ', jp: '<ruby>消<rt>け</rt></ruby>し<ruby>ゴム<rt>ごむ</rt></ruby>が<ruby>３<rt>さん</rt></ruby>こあります。',
+                        en: 'There are 3 erasers.', answer: 'さんこ', tts: 'けしごむがさんこあります。' },
+                    { label: '～にん', jp: '<ruby>子<rt>こ</rt></ruby><ruby>供<rt>ども</rt></ruby>が<ruby>２<rt>ふた</rt></ruby>りいます。',
+                        en: 'There are 2 children.', answer: 'ふたり', tts: 'こどもがふたりいます。' },
+                    { label: '～さつ', jp: '<ruby>本<rt>ほん</rt></ruby>を<ruby>１<rt>いっ</rt></ruby>さつ<ruby>読<rt>よ</rt></ruby>みました。',
+                        en: 'I read 1 book.', answer: 'いっさつ', tts: 'ほんをいっさつよみました。' },
+                    { label: '～ほん', jp: '<ruby>鉛<rt>えん</rt></ruby><ruby>筆<rt>ぴつ</rt></ruby>が<ruby>５<rt>ご</rt></ruby>ほんあります。',
+                        en: 'There are 5 pencils.', answer: 'ごほん', tts: 'えんぴつがごほんあります。' },
+                    { label: '～まい', jp: '<ruby>切<rt>き</rt></ruby><ruby>手<rt>って</rt></ruby>を<ruby>２<rt>に</rt></ruby>まいください。',
+                        en: 'Please give me 2 tickets.', answer: 'にまい', tts: 'きってをにまいください。' },
+                    { label: '～さい', jp: '<ruby>妹<rt>いもうと</rt></ruby>は<ruby>10<rt>じゅっ</rt></ruby>さいです。',
+                        en: 'My little sister is 10 years old.', answer: 'じゅっさい', tts: 'いもうとはじゅっさいです。' }
+                ]
+            },
+
+            frequency: {
+                title: '頻度',
+                subtitle: 'frequency adverbs',
+                table: {
+                    headers: ['日本語', 'English'],
+                    rows: [
+                        ['いつも', 'always'],
+                        ['よく', 'often'],
+                        ['ときどき', 'sometimes'],
+                        ['あまり', '(not) often'],
+                        ['ぜんぜん', 'never']
+                    ]
+                },
+                sentences: [
+                    { jp: '<ruby>毎日<rt>まいにち</rt></ruby><ruby>日本語<rt>にほんご</rt></ruby>を<ruby>勉強<rt>べんきょう</rt></ruby>します。',
+                        en: 'I study Japanese every day. (always)', answer: 'まいにち', tts: 'まいにちにほんごをべんきょうします。' },
+                    { jp: '<ruby>よく<rt>よく</rt></ruby><ruby>映画<rt>えいが</rt></ruby>を<ruby>見<rt>み</rt></ruby>ます。',
+                        en: 'I often watch movies.', answer: 'よく', tts: 'よくえいがをみます。' },
+                    { jp: '<ruby>時々<rt>ときどき</rt></ruby><ruby>公園<rt>こうえん</rt></ruby>を<ruby>散歩<rt>さんぽ</rt></ruby>します。',
+                        en: 'I sometimes walk in the park.', answer: 'ときどき', tts: 'ときどきこうえんをさんぽします。' },
+                    { jp: '<ruby>あまり<rt>あまり</rt></ruby><ruby>肉<rt>にく</rt></ruby>を<ruby>食<rt>た</rt></ruby>べません。',
+                        en: "I don't eat meat often.", answer: 'あまり', tts: 'あまりにくをたべません。' },
+                    { jp: '<ruby>全然<rt>ぜんぜん</rt></ruby><ruby>分<rt>わ</rt></ruby>かりません。',
+                        en: "I don't understand at all. (never)", answer: 'ぜんぜん', tts: 'ぜんぜんわかりません。' }
+                ]
+            },
+
+            numbers: {
+                title: '数字',
+                subtitle: 'numbers &amp; large units',
+                table: {
+                    headers: ['#', '10', '100', '1,000', '10,000', '100,000', '1,000,000'],
+                    rows: [
+                        ['1', 'じゅう', 'ひゃく', 'せん', 'いちまん', 'じゅうまん', 'ひゃくまん'],
+                        ['2', 'にじゅう', 'にひゃく', 'にせん', 'にまん', 'にじゅうまん', 'にひゃくまん'],
+                        ['3', 'さんじゅう', 'さんびゃく', 'さんぜん', 'さんまん', 'さんじゅうまん', 'さんびゃくまん'],
+                        ['4', 'よんじゅう', 'よんひゃく', 'よんせん', 'よんまん', 'よんじゅうまん', 'よんひゃくまん'],
+                        ['5', 'ごじゅう', 'ごひゃく', 'ごせん', 'ごまん', 'ごじゅうまん', 'ごひゃくまん'],
+                        ['6', 'ろくじゅう', 'ろっぴゃく', 'ろくせん', 'ろくまん', 'ろくじゅうまん', 'ろっぴゃくまん'],
+                        ['7', 'ななじゅう', 'ななひゃく', 'ななせん', 'ななまん', 'ななじゅうまん', 'ななひゃくまん'],
+                        ['8', 'はちじゅう', 'はっぴゃく', 'はっせん', 'はちまん', 'はちじゅうまん', 'はっぴゃくまん'],
+                        ['9', 'きゅうじゅう', 'きゅうひゃく', 'きゅうせん', 'きゅうまん', 'きゅうじゅうまん', 'きゅうひゃくまん']
+                    ]
+                },
+                sentences: [
+                    { jp: 'これは<ruby>１００<rt>ひゃく</rt></ruby><ruby>円<rt>えん</rt></ruby>です。', en: 'This is 100 yen.',
+                        answer: 'ひゃく', tts: 'これはひゃくえんです。' },
+                    { jp: '<ruby>３０００<rt>さんぜん</rt></ruby><ruby>人<rt>にん</rt></ruby>が<ruby>来<rt>き</rt></ruby>ました。',
+                        en: '3,000 people came.', answer: 'さんぜん', tts: 'さんぜんにんがきました。' },
+                    { jp: '<ruby>１００００<rt>いちまん</rt></ruby><ruby>円<rt>えん</rt></ruby><ruby>貸<rt>か</rt></ruby>してください。',
+                        en: 'Please lend me 10,000 yen.', answer: 'いちまん', tts: 'いちまんえんかしてください。' },
+                    { jp: '<ruby>１０００００<rt>じゅうまん</rt></ruby><ruby>人<rt>にん</rt></ruby>の<ruby>町<rt>まち</rt></ruby>です。',
+                        en: "It's a town of 100,000 people.", answer: 'じゅうまん', tts: 'じゅうまんにんのまちです。' }
+                ]
+            },
+
+            calendar: {
+                title: 'カレンダー',
+                subtitle: 'days of week &amp; month',
+                tables: [{
+                    headers: ['日', '月', '火', '水', '木', '金', '土'],
+                    rows: [
+                        ['にちようび', 'げつようび', 'かようび', 'すいようび', 'もくようび', 'きんようび', 'どようび'],
+                        ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+                    ]
+                }, {
+                    headers: ['１日', '２日', '３日', '４日', '５日', '６日', '７日'],
+                    rows: [
+                        ['ついたち', 'ふつか', 'みっか', 'よっか', 'いつか', 'むいか', 'なのか']
+                    ]
+                }, {
+                    headers: ['８日', '９日', '１０日', '１１日', '１２日', '１３日', '１４日'],
+                    rows: [
+                        ['ようか', 'ここのか', 'とおか', 'じゅういちにち', 'じゅうににち', 'じゅうさんにち', 'じゅうよっか']
+                    ]
+                }, {
+                    headers: ['１５日', '１６日', '１７日', '１８日', '１９日', '２０日', '２１日'],
+                    rows: [
+                        ['じゅうごにち', 'じゅうろくにち', 'じゅうしちにち', 'じゅうはちにち', 'じゅうくにち', 'はつか',
+                            'にじゅういちにち'
+                        ]
+                    ]
+                }, {
+                    headers: ['２２日', '２３日', '２４日', '２５日', '２６日', '２７日', '２８日'],
+                    rows: [
+                        ['にじゅうににち', 'にじゅうさんにち', 'にじゅうよっか', 'にじゅうごにち', 'にじゅうろくにち', 'にじゅうしちにち',
+                            'にじゅうはちにち'
+                        ]
+                    ]
+                }, {
+                    headers: ['２９日', '３０日', '３１日'],
+                    rows: [
+                        ['にじゅうくにち', 'さんじゅうにち', 'さんじゅういちにち']
+                    ]
+                }, {
+                    headers: ['おととい', 'きのう', 'きょう', 'あした', 'あさって', 'まいにち'],
+                    rows: [
+                        ['the day before yesterday', 'yesterday', 'today', 'tomorrow', 'the day after tomorrow',
+                            'every day'
+                        ]
+                    ]
+                }],
+                sentences: [
+                    { jp: '<ruby>今日<rt>きょう</rt></ruby>は<ruby>何月<rt>なんがつ</rt></ruby>ですか。',
+                        en: 'What month is it today?', answer: 'なんがつ', tts: 'きょうはなんがつですか。' },
+                    { jp: '<ruby>明日<rt>あした</rt></ruby>は<ruby>日曜日<rt>にちようび</rt></ruby>です。',
+                        en: 'Tomorrow is Sunday.', answer: 'にちようび', tts: 'あしたはにちようびです。' },
+                    { jp: '<ruby>昨日<rt>きのう</rt></ruby>は<ruby>１日<rt>ついたち</rt></ruby>でした。',
+                        en: 'Yesterday was the 1st.', answer: 'ついたち', tts: 'きのうはついたちでした。' },
+                    { jp: '<ruby>毎日<rt>まいにち</rt></ruby><ruby>勉強<rt>べんきょう</rt></ruby>します。',
+                        en: 'I study every day.', answer: 'まいにち', tts: 'まいにちべんきょうします。' },
+                    { label: '📅 Date',
+                        jp: '<ruby>今日<rt>きょう</rt></ruby>は<ruby>何日<rt>なんにち</rt></ruby>ですか。',
+                        en: 'What day is it today?', answer: 'なんにち', tts: 'きょうはなんにちですか。' },
+                    { label: '📅 Date',
+                        jp: '<ruby>私<rt>わたし</rt></ruby>の<ruby>誕生日<rt>たんじょうび</rt></ruby>は<ruby>７月１日<rt>しちがつついたち</rt></ruby>です。',
+                        en: 'My birthday is July 1st.', answer: 'しちがつついたち',
+                        tts: 'わたしのたんじょうびはしちがつついたちです。' },
+                    { label: '📅 Date',
+                        jp: '<ruby>明日<rt>あした</rt></ruby>は<ruby>３月２日<rt>さんがつふつか</rt></ruby>です。',
+                        en: 'Tomorrow is March 2nd.', answer: 'さんがつふつか', tts: 'あしたはさんがつふつかです。' },
+                    { label: '📅 Date',
+                        jp: '<ruby>１２月２５日<rt>じゅうにがつにじゅうごにち</rt></ruby>はクリスマスです。',
+                        en: 'December 25th is Christmas.', answer: 'じゅうにがつにじゅうごにち',
+                        tts: 'じゅうにがつにじゅうごにちはクリスマスです。' },
+                    { label: '📅 Date',
+                        jp: '<ruby>次<rt>つぎ</rt></ruby>のテストは<ruby>５月４日<rt>ごがつよっか</rt></ruby>です。',
+                        en: 'The next test is May 4th.', answer: 'ごがつよっか', tts: 'つぎのテストはごがつよっかです。' },
+                    { label: '📅 Date',
+                        jp: '<ruby>学校<rt>がっこう</rt></ruby>は<ruby>９月１日<rt>くがつついたち</rt></ruby>から<ruby>始<rt>はじ</rt></ruby>まります。',
+                        en: 'School starts from September 1st.', answer: 'くがつついたち',
+                        tts: 'がっこうはくがつついたちからはじまります。' }
+                ]
+            },
+
+            months: {
+                title: '月・週・年・季節',
+                subtitle: 'months, weeks, years, seasons',
+                tables: [{
+                    headers: ['１月', '２月', '３月', '４月', '５月', '６月'],
+                    rows: [
+                        ['いちがつ', 'にがつ', 'さんがつ', 'しがつ', 'ごがつ', 'ろくがつ']
+                    ]
+                }, {
+                    headers: ['７月', '８月', '９月', '１０月', '１１月', '１２月'],
+                    rows: [
+                        ['しちがつ', 'はちがつ', 'くがつ', 'じゅうがつ', 'じゅういちがつ', 'じゅうにがつ']
+                    ]
+                }, {
+                    headers: ['先週', '今週', '来週', '毎週'],
+                    rows: [
+                        ['せんしゅう', 'こんしゅう', 'らいしゅう', 'まいしゅう']
+                    ]
+                }, {
+                    headers: ['先月', '今月', '来月', '毎月'],
+                    rows: [
+                        ['せんげつ', 'こんげつ', 'らいげつ', 'まいつき']
+                    ]
+                }, {
+                    headers: ['去年', '今年', '来年', '毎年'],
+                    rows: [
+                        ['きょねん', 'ことし', 'らいねん', 'まいとし']
+                    ]
+                }, {
+                    headers: ['春', '夏', '秋', '冬'],
+                    rows: [
+                        ['はる', 'なつ', 'あき', 'ふゆ']
+                    ]
+                }],
+                sentences: [
+                    { jp: '<ruby>私<rt>わたし</rt></ruby>の<ruby>誕生日<rt>たんじょうび</rt></ruby>は<ruby>７月<rt>しちがつ</rt></ruby>です。',
+                        en: 'My birthday is in July.', answer: 'しちがつ', tts: 'わたしのたんじょうびはしちがつです。' },
+                    { jp: '<ruby>来週<rt>らいしゅう</rt></ruby><ruby>日本<rt>にほん</rt></ruby>に<ruby>行<rt>い</rt></ruby>きます。',
+                        en: "I'm going to Japan next week.", answer: 'らいしゅう', tts: 'らいしゅうにほんにいきます。' },
+                    { jp: '<ruby>今年<rt>ことし</rt></ruby>は<ruby>何歳<rt>なんさい</rt></ruby>になりますか。',
+                        en: 'How old will you be this year?', answer: 'ことし', tts: 'ことしはなんさいになりますか。' },
+                    { jp: '<ruby>春<rt>はる</rt></ruby>が<ruby>一番<rt>いちばん</rt></ruby><ruby>好<rt>す</rt></ruby>きです。',
+                        en: 'I like spring the most.', answer: 'はる', tts: 'はるがいちばんすきです。' }
+                ]
+            },
+
+            time: {
+                title: '時間',
+                subtitle: 'time',
+                tables: [{
+                    headers: ['朝', '昼', '夜', '午前', '午後'],
+                    rows: [
+                        ['あさ', 'ひる', 'よる', 'ごぜん', 'ごご']
+                    ]
+                }, {
+                    headers: ['1:00', '2:00', '3:00', '4:00', '5:00', '6:00'],
+                    rows: [
+                        ['いちじ', 'にじ', 'さんじ', 'よじ', 'ごじ', 'ろくじ']
+                    ]
+                }, {
+                    headers: ['7:00', '8:00', '9:00', '10:00', '11:00', '12:00'],
+                    rows: [
+                        ['しちじ', 'はちじ', 'くじ', 'じゅうじ', 'じゅういちじ', 'じゅうにじ']
+                    ]
+                }, {
+                    headers: ['いつ', 'なんじ', '〜じ', '〜はん', '〜ごろ'],
+                    rows: [
+                        ['when', 'what time', "o'clock", 'half past', 'about']
+                    ]
+                }],
+                sentences: [
+                    { jp: '<ruby>今<rt>いま</rt></ruby><ruby>何時<rt>なんじ</rt></ruby>ですか。', en: 'What time is it now?',
+                        answer: 'なんじ', tts: 'いまなんじですか。' },
+                    { jp: '<ruby>午前<rt>ごぜん</rt></ruby><ruby>９時<rt>くじ</rt></ruby>に<ruby>起<rt>お</rt></ruby>きます。',
+                        en: 'I wake up at 9:00 AM.', answer: 'くじ', tts: 'ごぜんくじにおきます。' },
+                    { jp: '<ruby>夜<rt>よる</rt></ruby><ruby>１０時<rt>じゅうじ</rt></ruby><ruby>半<rt>はん</rt></ruby>に<ruby>寝<rt>ね</rt></ruby>ます。',
+                        en: 'I go to bed at 10:30 PM.', answer: 'じゅうじはん', tts: 'よるじゅうじはんにねます。' },
+                    { jp: '<ruby>明日<rt>あした</rt></ruby>の<ruby>３時<rt>さんじ</rt></ruby><ruby>頃<rt>ごろ</rt></ruby><ruby>会<rt>あ</rt></ruby>いましょう。',
+                        en: "Let's meet around 3:00 tomorrow.", answer: 'さんじごろ', tts: 'あしたのさんじごろあいましょう。' }
+                ]
+            },
+
+            duration: {
+                title: '時間・場所・量',
+                subtitle: 'duration, location, quantity',
+                tables: [{
+                    headers: ['１時間', '１日', '１週間', '１ヶ月', '１年'],
+                    rows: [
+                        ['いちじかん', 'いちにち', 'いっしゅうかん', 'いっかげつ', 'いちねん']
+                    ]
+                }, {
+                    headers: ['何時間', '何日', '何週間', '何ヶ月', '何年'],
+                    rows: [
+                        ['なんじかん', 'なんにち', 'なんしゅうかん', 'なんかげつ', 'なんねん']
+                    ]
+                }, {
+                    headers: ['上', '前', '中', '下', '後ろ', '外', '近く', '隣', '横'],
+                    rows: [
+                        ['うえ', 'まえ', 'なか', 'した', 'うしろ', 'そと', 'ちかく', 'となり', 'よこ']
+                    ]
+                }, {
+                    headers: ['たくさん', 'すこし', 'ちょっと', 'あまり', 'ぜんぜん'],
+                    rows: [
+                        ['a lot', 'a little', 'a little', '(not) many', '(not) at all']
+                    ]
+                }],
+                sentences: [
+                    { jp: '<ruby>日本<rt>にほん</rt></ruby>に<ruby>１年<rt>いちねん</rt></ruby><ruby>住<rt>す</rt></ruby>んでいました。',
+                        en: 'I lived in Japan for 1 year.', answer: 'いちねん', tts: 'にほんにいちねんすんでいました。' },
+                    { jp: '<ruby>机<rt>つくえ</rt></ruby>の<ruby>上<rt>うえ</rt></ruby>に<ruby>本<rt>ほん</rt></ruby>があります。',
+                        en: 'There is a book on the desk.', answer: 'うえ', tts: 'つくえのうえにほんがあります。' },
+                    { jp: '<ruby>学校<rt>がっこう</rt></ruby>の<ruby>前<rt>まえ</rt></ruby>に<ruby>待<rt>ま</rt></ruby>っています。',
+                        en: "I'm waiting in front of the school.", answer: 'まえ', tts: 'がっこうのまえにまっています。' },
+                    { jp: '<ruby>たくさん<rt>たくさん</rt></ruby><ruby>食<rt>た</rt></ruby>べました。', en: 'I ate a lot.',
+                        answer: 'たくさん', tts: 'たくさんたべました。' },
+                    { jp: '<ruby>少<rt>すこ</rt></ruby>しだけ<ruby>話<rt>はな</rt></ruby>せます。', en: 'I can speak only a little.',
+                        answer: 'すこし', tts: 'すこしだけはなせます。' }
+                ]
+            },
+
+            directions: {
+                title: '方向・場所',
+                subtitle: 'directions &amp; locations',
+                table: {
+                    headers: ['日本語', 'English'],
+                    rows: [
+                        ['入口', 'entrance'],
+                        ['出口', 'exit'],
+                        ['北口', 'north exit'],
+                        ['南口', 'south exit'],
+                        ['西口', 'west exit'],
+                        ['東口', 'east exit'],
+                        ['左', 'left'],
+                        ['右', 'right'],
+                        ['まっすぐ', 'straight'],
+                        ['空車', 'vacant / empty taxi'],
+                        ['駐車場', 'parking space / parking lot']
+                    ]
+                },
+                sentences: [
+                    { label: '入口', jp: '<ruby>入口<rt>いりぐち</rt></ruby>は<ruby>右<rt>みぎ</rt></ruby>です。',
+                        en: 'The entrance is on the right.', answer: 'みぎ', tts: 'いりぐちはみぎです。' },
+                    { label: '出口', jp: '<ruby>出口<rt>でぐち</rt></ruby>は<ruby>左<rt>ひだり</rt></ruby>です。',
+                        en: 'The exit is on the left.', answer: 'ひだり', tts: 'でぐちはひだりです。' },
+                    { label: '北口', jp: '<ruby>北口<rt>きたぐち</rt></ruby>まで<ruby>行<rt>い</rt></ruby>きます。',
+                        en: "I'm going to the north exit.", answer: 'きたぐち', tts: 'きたぐちまでいきます。' },
+                    { label: '南口', jp: '<ruby>南口<rt>みなみぐち</rt></ruby>で<ruby>待<rt>ま</rt></ruby>ち<ruby>合<rt>あ</rt></ruby>わせましょう。',
+                        en: "Let's meet at the south exit.", answer: 'みなみぐち', tts: 'みなみぐちでまちあわせましょう。' },
+                    { label: '西口', jp: '<ruby>西口<rt>にしぐち</rt></ruby>は<ruby>どこ<rt>どこ</rt></ruby>ですか。',
+                        en: 'Where is the west exit?', answer: 'にしぐち', tts: 'にしぐちはどこですか。' },
+                    { label: '東口', jp: '<ruby>東口<rt>ひがしぐち</rt></ruby>に<ruby>車<rt>くるま</rt></ruby>が<ruby>止<rt>と</rt></ruby>めてあります。',
+                        en: 'There is a car parked at the east exit.', answer: 'ひがしぐち',
+                        tts: 'ひがしぐちにくるまがとめてあります。' },
+                    { label: '左', jp: '<ruby>左<rt>ひだり</rt></ruby>に<ruby>曲<rt>ま</rt></ruby>がってください。',
+                        en: 'Please turn left.', answer: 'ひだり', tts: 'ひだりにまがってください。' },
+                    { label: '右', jp: '<ruby>右<rt>みぎ</rt></ruby>に<ruby>曲<rt>ま</rt></ruby>がってください。',
+                        en: 'Please turn right.', answer: 'みぎ', tts: 'みぎにまがってください。' },
+                    { label: 'まっすぐ',
+                        jp: '<ruby>北口<rt>きたぐち</rt></ruby>まで<ruby>まっすぐ<rt>まっすぐ</rt></ruby><ruby>行<rt>い</rt></ruby>ってください。',
+                        en: 'Go straight to the north exit.', answer: 'まっすぐ', tts: 'きたぐちまでまっすぐいってください。' },
+                    { label: '空車', jp: '<ruby>空車<rt>くうしゃ</rt></ruby>の<ruby> taxi <rt>たくしー</rt></ruby>が<ruby>来<rt>き</rt></ruby>ました。',
+                        en: 'An empty taxi came.', answer: 'くうしゃ', tts: 'くうしゃのたくしーがきました。' },
+                    { label: '駐車場',
+                        jp: '<ruby>駐車場<rt>ちゅうしゃじょう</rt></ruby>は<ruby>東口<rt>ひがしぐち</rt></ruby>の<ruby>近<rt>ちか</rt></ruby>くです。',
+                        en: 'The parking lot is near the east exit.', answer: 'ひがしぐち',
+                        tts: 'ちゅうしゃじょうはひがしぐちのちかくです。' }
+                ]
+            },
+
+            classroom1: {
+                title: '教室 1',
+                subtitle: 'classroom vocabulary',
+                table: {
+                    headers: ['日本語', 'English'],
+                    rows: [
+                        ['学生', 'student'],
+                        ['受講者', 'participant'],
+                        ['友達', 'friend'],
+                        ['学校', 'school'],
+                        ['事務室', 'office room'],
+                        ['先生', 'teacher / instructor'],
+                        ['皆さん', 'everyone'],
+                        ['隣の人', 'the person next to you'],
+                        ['教室', 'classroom'],
+                        ['クラス', 'class / lesson'],
+                        ['みんな', 'everyone'],
+                        ['椅子', 'chair'],
+                        ['鉛筆', 'pencil'],
+                        ['消しゴム', 'eraser'],
+                        ['辞書', 'dictionary'],
+                        ['教科書', 'textbook'],
+                        ['コンピューター', 'computer'],
+                        ['机', 'desk'],
+                        ['ペン', 'pen'],
+                        ['ノート', 'notebook'],
+                        ['携帯電話', 'mobile phone / cellular phone'],
+                        ['ページ', 'page'],
+                        ['ホワイトボード', 'whiteboard']
+                    ]
+                },
+                table2: {
+                    headers: ['日本語', 'English'],
+                    rows: [
+                        ['問題', 'question / problem'],
+                        ['答え', 'answer'],
+                        ['番号', 'number'],
+                        ['書きます', 'to write'],
+                        ['描きます', 'to draw'],
+                        ['丸', 'circle (true)'],
+                        ['×', 'cross (false)'],
+                        ['例', 'example'],
+                        ['勉強（を）します', 'to study'],
+                        ['練習（を）します', 'to practise'],
+                        ['会話（を）します', 'to have a conversation'],
+                        ['話します', 'to talk / to speak'],
+                        ['予習', 'preparation (for lesson)'],
+                        ['復習', 'review'],
+                        ['言います', 'to say / to tell'],
+                        ['聞きます', 'to listen'],
+                        ['宿題', 'homework'],
+                        ['試験', 'examination'],
+                        ['テスト', 'test'],
+                        ['見ます', 'to look'],
+                        ['読みます', 'to read'],
+                        ['質問（を）します', 'to ask a question'],
+                        ['説明（を）します', 'to explain'],
+                        ['相談（を）します', 'to consult / to discuss'],
+                        ['チェック（を）します', 'to check'],
+                        ['コピー（を）します', 'to copy']
+                    ]
+                },
+                sentences: [
+                    { label: '学生', jp: '<ruby>私<rt>わたし</rt></ruby>は<ruby>学生<rt>がくせい</rt></ruby>です。',
+                        en: 'I am a student.', answer: 'がくせい', tts: 'わたしはがくせいです。' },
+                    { label: '受講者', jp: '<ruby>受講者<rt>じゅこうしゃ</rt></ruby>は<ruby>２０<rt>にじゅう</rt></ruby><ruby>人<rt>にん</rt></ruby>です。',
+                        en: 'There are 20 participants.', answer: 'じゅこうしゃ', tts: 'じゅこうしゃはにじゅうにんです。' },
+                    { label: '友達', jp: 'これは<ruby>友達<rt>ともだち</rt></ruby>です。', en: 'This is my friend.',
+                        answer: 'ともだち', tts: 'これはともだちです。' },
+                    { label: '学校', jp: '<ruby>学校<rt>がっこう</rt></ruby>に<ruby>行<rt>い</rt></ruby>きます。',
+                        en: "I'm going to school.", answer: 'がっこう', tts: 'がっこうにいきます。' },
+                    { label: '事務室', jp: '<ruby>事務室<rt>じむしつ</rt></ruby>は<ruby>２階<rt>にかい</rt></ruby>です。',
+                        en: 'The office is on the 2nd floor.', answer: 'じむしつ', tts: 'じむしつはにかいです。' },
+                    { label: '先生', jp: '<ruby>先生<rt>せんせい</rt></ruby>の<ruby>話<rt>はなし</rt></ruby>を<ruby>聞<rt>き</rt></ruby>きました。',
+                        en: 'I listened to the teacher.', answer: 'せんせい', tts: 'せんせいのはなしをききました。' },
+                    { label: '皆さん', jp: '<ruby>皆さん<rt>みなさん</rt></ruby>、こんにちは。', en: 'Hello everyone.',
+                        answer: 'みなさん', tts: 'みなさんこんにちは。' },
+                    { label: '隣の人', jp: '<ruby>隣<rt>となり</rt></ruby>の<ruby>人<rt>ひと</rt></ruby>に<ruby>聞<rt>き</rt></ruby>いてください。',
+                        en: 'Please ask the person next to you.', answer: 'となり', tts: 'となりのひとにきいてください。' },
+                    { label: '教室', jp: '<ruby>教室<rt>きょうしつ</rt></ruby>に<ruby>机<rt>つくえ</rt></ruby>があります。',
+                        en: 'There is a desk in the classroom.', answer: 'きょうしつ', tts: 'きょうしつにつくえがあります。' },
+                    { label: 'クラス', jp: 'このクラスは<ruby>楽<rt>たの</rt></ruby>しいです。', en: 'This class is fun.',
+                        answer: 'クラス', tts: 'このクラスはたのしいです。' },
+                    { label: 'みんな', jp: 'みんな<ruby>集<rt>あつ</rt></ruby>まってください。', en: 'Everyone please gather.',
+                        answer: 'みんな', tts: 'みんなあつまってください。' },
+                    { label: '椅子', jp: '<ruby>椅子<rt>いす</rt></ruby>に<ruby>座<rt>すわ</rt></ruby>ってください。',
+                        en: 'Please sit on the chair.', answer: 'いす', tts: 'いすにすわってください。' },
+                    { label: '鉛筆', jp: '<ruby>鉛筆<rt>えんぴつ</rt></ruby>で<ruby>書<rt>か</rt></ruby>いてください。',
+                        en: 'Please write with a pencil.', answer: 'えんぴつ', tts: 'えんぴつでかいてください。' },
+                    { label: '消しゴム', jp: '<ruby>消<rt>け</rt></ruby>しゴムを<ruby>貸<rt>か</rt></ruby>してください。',
+                        en: 'Please lend me an eraser.', answer: 'けしごむ', tts: 'けしごむをかしてください。' },
+                    { label: '辞書', jp: '<ruby>辞書<rt>じしょ</rt></ruby>を<ruby>使<rt>つか</rt></ruby>います。',
+                        en: 'I use a dictionary.', answer: 'じしょ', tts: 'じしょをつかいます。' },
+                    { label: '教科書', jp: '<ruby>教科書<rt>きょうかしょ</rt></ruby>を<ruby>開<rt>ひら</rt></ruby>いてください。',
+                        en: 'Please open your textbook.', answer: 'きょうかしょ', tts: 'きょうかしょをひらいてください。' },
+                    { label: 'コンピューター', jp: 'コンピューターを<ruby>使<rt>つか</rt></ruby>います。',
+                        en: 'I use a computer.', answer: 'コンピューター', tts: 'コンピューターをつかいます。' },
+                    { label: '机', jp: '<ruby>机<rt>つくえ</rt></ruby>の<ruby>上<rt>うえ</rt></ruby>に<ruby>本<rt>ほん</rt></ruby>があります。',
+                        en: 'There is a book on the desk.', answer: 'つくえ', tts: 'つくえのうえにほんがあります。' },
+                    { label: 'ペン', jp: 'ペンで<ruby>書<rt>か</rt></ruby>いてください。', en: 'Please write with a pen.',
+                        answer: 'ペン', tts: 'ペンでかいてください。' },
+                    { label: 'ノート', jp: 'ノートに<ruby>書<rt>か</rt></ruby>いてください。', en: 'Please write in your notebook.',
+                        answer: 'ノート', tts: 'ノートにかいてください。' },
+                    { label: '携帯電話', jp: '<ruby>携帯電話<rt>けいたいでんわ</rt></ruby>を<ruby>切<rt>き</rt></ruby>ってください。',
+                        en: 'Please turn off your mobile phone.', answer: 'けいたいでんわ',
+                        tts: 'けいたいでんわをきってください。' },
+                    { label: 'ページ', jp: '<ruby>１０<rt>じゅう</rt></ruby>ページを<ruby>見<rt>み</rt></ruby>てください。',
+                        en: 'Please look at page 10.', answer: 'ページ', tts: 'じゅうページをみてください。' },
+                    { label: 'ホワイトボード', jp: 'ホワイトボードに<ruby>書<rt>か</rt></ruby>いてください。',
+                        en: 'Please write on the whiteboard.', answer: 'ホワイトボード', tts: 'ホワイトボードにかいてください。' },
+                    { label: '宿題', jp: '<ruby>宿題<rt>しゅくだい</rt></ruby>を<ruby>書<rt>か</rt></ruby>きました。',
+                        en: 'I wrote the homework.', answer: 'しゅくだい', tts: 'しゅくだいをかきました。' },
+                    { label: '試験', jp: '<ruby>試験<rt>しけん</rt></ruby>は<ruby>明日<rt>あした</rt></ruby>です。',
+                        en: 'The exam is tomorrow.', answer: 'しけん', tts: 'しけんはあしたです。' },
+                    { label: 'テスト', jp: 'テストを<ruby>受<rt>う</rt></ruby>けます。', en: 'I will take the test.',
+                        answer: 'テスト', tts: 'テストをうけます。' },
+                    { label: '問題', jp: '<ruby>問題<rt>もんだい</rt></ruby>を<ruby>解<rt>と</rt></ruby>いてください。',
+                        en: 'Please solve the problem.', answer: 'もんだい', tts: 'もんだいをといてください。' },
+                    { label: '答え', jp: '<ruby>答<rt>こた</rt></ruby>えを<ruby>書<rt>か</rt></ruby>いてください。',
+                        en: 'Please write the answer.', answer: 'こたえ', tts: 'こたえをかいてください。' },
+                    { label: '番号', jp: '<ruby>番号<rt>ばんごう</rt></ruby>を<ruby>書<rt>か</rt></ruby>いてください。',
+                        en: 'Please write the number.', answer: 'ばんごう', tts: 'ばんごうをかいてください。' },
+                    { label: '書きます', jp: '<ruby>字<rt>じ</rt></ruby>を<ruby>書<rt>か</rt></ruby>きます。',
+                        en: 'I write letters.', answer: 'かきます', tts: 'じをかきます。' },
+                    { label: '描きます', jp: '<ruby>絵<rt>え</rt></ruby>を<ruby>描<rt>か</rt></ruby>きます。',
+                        en: 'I draw pictures.', answer: 'かきます', tts: 'えをかきます。' },
+                    { label: '勉強します', jp: '<ruby>日本語<rt>にほんご</rt></ruby>を<ruby>勉強<rt>べんきょう</rt></ruby>します。',
+                        en: 'I study Japanese.', answer: 'べんきょう', tts: 'にほんごをべんきょうします。' },
+                    { label: '練習します', jp: '<ruby>練習<rt>れんしゅう</rt></ruby>をします。', en: 'I practice.',
+                        answer: 'れんしゅう', tts: 'れんしゅうをします。' },
+                    { label: '話します', jp: '<ruby>日本語<rt>にほんご</rt></ruby>を<ruby>話<rt>はな</rt></ruby>します。',
+                        en: 'I speak Japanese.', answer: 'はなします', tts: 'にほんごをはなします。' },
+                    { label: '読みます', jp: '<ruby>本<rt>ほん</rt></ruby>を<ruby>読<rt>よ</rt></ruby>みます。',
+                        en: 'I read a book.', answer: 'よみます', tts: 'ほんをよみます。' },
+                    { label: '聞きます', jp: '<ruby>音楽<rt>おんがく</rt></ruby>を<ruby>聞<rt>き</rt></ruby>きます。',
+                        en: 'I listen to music.', answer: 'ききます', tts: 'おんがくをききます。' },
+                    { label: '見ます', jp: '<ruby>映画<rt>えいが</rt></ruby>を<ruby>見<rt>み</rt></ruby>ます。',
+                        en: 'I watch a movie.', answer: 'みます', tts: 'えいがをみます。' },
+                    { label: '質問します', jp: '<ruby>質問<rt>しつもん</rt></ruby>をします。', en: 'I ask a question.',
+                        answer: 'しつもん', tts: 'しつもんをします。' }
+                ]
+            },
+
+            classroom2: {
+                title: '教室 2',
+                subtitle: 'classroom expressions',
+                table: {
+                    headers: ['日本語', 'English'],
+                    rows: [
+                        ['〜を教えてください', 'Could you tell me ~, please?'],
+                        ['〜ってどういう意味ですか', 'What does "~" mean?'],
+                        ['〜を忘れました', 'I forgot ~'],
+                        ['〜を見せてください', 'Could you show me ~, please?'],
+                        ['〜を貸してください', 'May I borrow ~?'],
+                        ['まだです', 'not yet'],
+                        ['遅れます', 'to be late / to be delayed'],
+                        ['休みます', 'to be absent / to take a day off'],
+                        ['もう一度言ってください', 'Could you say that again, please?'],
+                        ['もう少しゆっくり言ってください', 'Could you speak a little more slowly, please?'],
+                        ['わかりました', 'I see / understand'],
+                        ['わかりません', "I don't understand"]
+                    ]
+                },
+                sentences: [
+                    { label: '〜を教えてください',
+                        jp: 'この<ruby>漢字<rt>かんじ</rt></ruby>の<ruby>意味<rt>いみ</rt></ruby>を<ruby>教<rt>おし</rt></ruby>えてください。',
+                        en: 'Could you tell me the meaning of this kanji?', answer: 'おしえて',
+                        tts: 'このかんじのいみをおしえてください。' },
+                    { label: '〜ってどういう意味ですか',
+                        jp: '「<ruby>大丈夫<rt>だいじょうぶ</rt></ruby>」ってどういう<ruby>意味<rt>いみ</rt></ruby>ですか。',
+                        en: "What does 'daijoubu' mean?", answer: 'どういういみ',
+                        tts: 'だいじょうぶってどういういみですか。' },
+                    { label: '〜を忘れました', jp: '<ruby>宿題<rt>しゅくだい</rt></ruby>を<ruby>忘<rt>わす</rt></ruby>れました。',
+                        en: 'I forgot my homework.', answer: 'わすれました', tts: 'しゅくだいをわすれました。' },
+                    { label: '〜を見せてください', jp: '<ruby>教科書<rt>きょうかしょ</rt></ruby>を<ruby>見<rt>み</rt></ruby>せてください。',
+                        en: 'Could you show me your textbook?', answer: 'みせて', tts: 'きょうかしょをみせてください。' },
+                    { label: '〜を貸してください', jp: '<ruby>鉛筆<rt>えんぴつ</rt></ruby>を<ruby>貸<rt>か</rt></ruby>してください。',
+                        en: 'May I borrow your pencil?', answer: 'かしてください', tts: 'えんぴつをかしてください。' },
+                    { label: 'まだです', jp: '<ruby>宿題<rt>しゅくだい</rt></ruby>はまだです。', en: 'My homework is not done yet.',
+                        answer: 'まだ', tts: 'しゅくだいはまだです。' },
+                    { label: '遅れます', jp: '<ruby>今日<rt>きょう</rt></ruby>は<ruby>遅<rt>おく</rt></ruby>れます。',
+                        en: 'I will be late today.', answer: 'おくれます', tts: 'きょうはおくれます。' },
+                    { label: '休みます', jp: '<ruby>明日<rt>あした</rt></ruby>は<ruby>休<rt>やす</rt></ruby>みます。',
+                        en: 'I will be absent tomorrow.', answer: 'やすみます', tts: 'あしたはやすみます。' },
+                    { label: 'もう一度言ってください', jp: 'もう<ruby>一度<rt>いちど</rt></ruby><ruby>言<rt>い</rt></ruby>ってください。',
+                        en: 'Could you say that again, please?', answer: 'もういちど', tts: 'もういちどいってください。' },
+                    { label: 'もう少しゆっくり言ってください',
+                        jp: 'もう<ruby>少<rt>すこ</rt></ruby>しゆっくり<ruby>言<rt>い</rt></ruby>ってください。',
+                        en: 'Could you speak a little more slowly, please?', answer: 'ゆっくり',
+                        tts: 'もうすこしゆっくりいってください。' },
+                    { label: 'わかりました', jp: '<ruby>分<rt>わ</rt></ruby>かりました。', en: 'I understand.', answer: 'わかりました',
+                        tts: 'わかりました。' },
+                    { label: 'わかりません', jp: '<ruby>分<rt>わ</rt></ruby>かりません。', en: "I don't understand.",
+                        answer: 'わかりません', tts: 'わかりません。' }
+                ]
+            }
+        };
+
+        // ──────────────────────────────────────────────────────
+        // 2. BUILD SHEETS FROM DATA
+        // ──────────────────────────────────────────────────────
+
+        function buildTable(tableData) {
+            if (!tableData || !tableData.rows || tableData.rows.length === 0) return '';
+            let html = '<table>';
+            if (tableData.headers) {
+                html += '<thead><tr>';
+                tableData.headers.forEach(h => html += `<th>${h}</th>`);
+                html += '</tr></thead>';
+            }
+            html += '<tbody>';
+            tableData.rows.forEach(row => {
+                html += '<tr>';
+                row.forEach(cell => html += `<td>${cell}</td>`);
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            return html;
+        }
+
+        function buildSentences(sentences) {
+            if (!sentences || sentences.length === 0) return '';
+            let html = '<h3>例文 / Examples</h3><div class="sentence-grid" data-sheet="temp">';
+            sentences.forEach(s => {
+                const label = s.label ? `<span class="label">${s.label}</span>` : '';
+                html += `
+                    <div class="sentence-item" data-answer="${s.answer}" data-jp="${s.jp}">
+                        ${label}
+                        <span class="jp">${s.jp}</span>
+                        <span class="en">${s.en}</span>
+                        <button class="tts-btn" data-text="${s.tts || s.jp.replace(/<[^>]*>/g, '')}">🔊</button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function buildSheet(id, data) {
+            let html = `<section class="sheet" id="sheet-${id}">`;
+            html += `<h2>${data.title} <span class="sub">${data.subtitle}</span></h2>`;
+
+            if (data.table) {
+                html += buildTable(data.table);
+            }
+            if (data.tables) {
+                data.tables.forEach(t => html += buildTable(t));
+            }
+            if (data.table2) {
+                html += '<h3>動詞 / Verbs</h3>';
+                html += buildTable(data.table2);
+            }
+
+            html += buildSentences(data.sentences);
+            html += '</section>';
+            return html;
+        }
+
+        // Build all sheets and insert into container
+        const container = document.getElementById('sheetsContainer');
+        let allSheetsHTML = '';
+        for (const [id, data] of Object.entries(sheetData)) {
+            allSheetsHTML += buildSheet(id, data);
+        }
+        container.innerHTML = allSheetsHTML;
+
+        // ──────────────────────────────────────────────────────
+        // 3. APPLICATION LOGIC
+        // ──────────────────────────────────────────────────────
+
+        (function() {
+            'use strict';
+
+            const body = document.body;
+            const furiganaToggle = document.getElementById('furiganaToggle');
+            const translationToggle = document.getElementById('translationToggle');
+            const ttsToggle = document.getElementById('ttsToggle');
+            const quizToggle = document.getElementById('quizToggle');
+            const focusToggle = document.getElementById('focusToggle');
+            const resetButton = document.getElementById('resetButton');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const tabs = document.querySelectorAll('.tab-btn');
+
+            let quizMode = false;
+            let focusMode = false;
+            let quizScore = { correct: 0, incorrect: 0 };
+            let ttsEnabled = true;
+            let translationsVisible = true;
+
+            // ── Furigana Toggle ──
+            // Simple approach: toggle a class on body that hides rt elements
+            function applyFurigana() {
+                const show = furiganaToggle.checked;
+                body.classList.toggle('no-furigana', !show);
+            }
+
+            furiganaToggle.addEventListener('change', applyFurigana);
+            applyFurigana();
+
+            // ── Translation Toggle ──
+            function applyTranslation() {
+                body.classList.toggle('no-translation', !translationsVisible);
+                translationToggle.textContent = translationsVisible ? '🌐 訳' : '🌐 訳 OFF';
+                translationToggle.classList.toggle('off', !translationsVisible);
+            }
+            translationToggle.addEventListener('click', function() {
+                translationsVisible = !translationsVisible;
+                applyTranslation();
+            });
+            applyTranslation();
+
+            // ── Focus Mode Toggle ──
+            function applyFocus() {
+                body.classList.toggle('focus-mode', focusMode);
+                focusToggle.textContent = focusMode ? '🎯 Focus ON' : '🎯 Focus';
+                focusToggle.classList.toggle('active', focusMode);
+            }
+            focusToggle.addEventListener('click', function() {
+                focusMode = !focusMode;
+                applyFocus();
+            });
+
+            // ── TTS ──
+            function speakText(text) {
+                if (!ttsEnabled) return;
+                if (!window.speechSynthesis) return;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ja-JP';
+                utterance.rate = 0.85;
+                utterance.pitch = 1;
+                const voices = window.speechSynthesis.getVoices();
+                const jaVoice = voices.find(v => v.lang.startsWith('ja'));
+                if (jaVoice) utterance.voice = jaVoice;
+                window.speechSynthesis.speak(utterance);
+            }
+
+            window.speechSynthesis.getVoices();
+            window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+
+            function attachTTS() {
+                document.querySelectorAll('.tts-btn').forEach(btn => {
+                    btn.removeEventListener('click', ttsHandler);
+                    btn.addEventListener('click', ttsHandler);
+                });
+            }
+
+            function ttsHandler(e) {
+                e.stopPropagation();
+                const text = this.dataset.text;
+                if (text) speakText(text);
+            }
+
+            ttsToggle.addEventListener('click', function() {
+                ttsEnabled = !ttsEnabled;
+                this.textContent = ttsEnabled ? '🔊 TTS' : '🔇 TTS';
+                this.classList.toggle('off', !ttsEnabled);
+            });
+
+            // ── Tab Switching ──
+            tabs.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    tabs.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const target = this.dataset.tab;
+                    document.querySelectorAll('.sheet').forEach(s => s.classList.remove('active'));
+                    const sheet = document.getElementById('sheet-' + target);
+                    if (sheet) sheet.classList.add('active');
+                    attachTTS();
+                    // Re-apply furigana state on tab switch
+                    applyFurigana();
+                    if (quizMode) applyQuizMode();
+                    updateScore();
+                    if (focusMode) {
+                        focusMode = false;
+                        applyFocus();
+                    }
+                });
+            });
+
+            // ── Quiz Mode ──
+            function updateScore() {
+                const total = quizScore.correct + quizScore.incorrect;
+                scoreDisplay.textContent = total > 0 ? `✅ ${quizScore.correct} ❌ ${quizScore.incorrect}` : '';
+            }
+
+            function applyQuizMode() {
+                const activeSheet = document.querySelector('.sheet.active');
+                if (!activeSheet) return;
+                const grid = activeSheet.querySelector('.sentence-grid');
+                if (!grid) return;
+
+                grid.classList.toggle('quiz-mode', quizMode);
+
+                const items = grid.querySelectorAll('.sentence-item');
+                items.forEach(item => {
+                    const oldInput = item.querySelector('.quiz-input');
+                    const oldBtn = item.querySelector('.quiz-check-btn');
+                    const oldResult = item.querySelector('.quiz-result');
+                    if (oldInput) oldInput.remove();
+                    if (oldBtn) oldBtn.remove();
+                    if (oldResult) oldResult.remove();
+
+                    if (quizMode) {
+                        const jpSpan = item.querySelector('.jp');
+                        if (!jpSpan) return;
+                        const answer = item.dataset.answer || '';
+                        let newHTML = jpSpan.innerHTML;
+                        // Remove any existing blank spans
+                        newHTML = newHTML.replace(/<span[^>]*>_____<\/span>/g, '_____');
+                        if (answer && newHTML.includes(answer)) {
+                            newHTML = newHTML.replace(answer, '<span class="quiz-blank">_____</span>');
+                        } else {
+                            const match = newHTML.match(/<ruby>.*?<rt>.*?<\/rt>.*?<\/ruby>/);
+                            if (match) {
+                                newHTML = newHTML.replace(match[0], '_____');
+                            }
+                        }
+                        jpSpan.innerHTML = newHTML;
+
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.className = 'quiz-input';
+                        input.placeholder = '?';
+                        input.autocomplete = 'off';
+
+                        const checkBtn = document.createElement('button');
+                        checkBtn.className = 'quiz-check-btn';
+                        checkBtn.textContent = 'Check';
+
+                        const resultSpan = document.createElement('span');
+                        resultSpan.className = 'quiz-result';
+
+                        const wrapper = document.createElement('span');
+                        wrapper.style.display = 'inline-block';
+                        wrapper.style.marginLeft = '0.5rem';
+                        wrapper.appendChild(input);
+                        wrapper.appendChild(checkBtn);
+                        wrapper.appendChild(resultSpan);
+
+                        jpSpan.parentNode.insertBefore(wrapper, jpSpan.nextSibling);
+
+                        function checkAnswer() {
+                            const userAnswer = input.value.trim();
+                            const isCorrect = userAnswer === answer;
+                            input.className = 'quiz-input' + (isCorrect ? ' correct' : ' incorrect');
+                            resultSpan.textContent = isCorrect ? '✅' : '❌ (' + answer + ')';
+                            resultSpan.className = 'quiz-result ' + (isCorrect ? 'correct' : 'incorrect');
+                            if (isCorrect) {
+                                quizScore.correct++;
+                            } else {
+                                quizScore.incorrect++;
+                            }
+                            updateScore();
+                            checkBtn.disabled = true;
+                            input.disabled = true;
+                        }
+
+                        checkBtn.addEventListener('click', checkAnswer);
+                        input.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                if (!this.disabled) checkAnswer();
+                            }
+                        });
+
+                        item._quizData = { input, checkBtn, resultSpan };
+                    } else {
+                        const jpSpan = item.querySelector('.jp');
+                        if (jpSpan && item.dataset.jp) {
+                            // Restore original from data-jp
+                            jpSpan.innerHTML = item.dataset.jp;
+                            // Re-apply furigana state
+                            applyFurigana();
+                        }
+                    }
+                });
+            }
+
+            quizToggle.addEventListener('click', function() {
+                quizMode = !quizMode;
+                this.textContent = quizMode ? '📝 Quiz ON' : '📝 Quiz';
+                this.classList.toggle('active', quizMode);
+                if (quizMode) {
+                    quizScore = { correct: 0, incorrect: 0 };
+                    updateScore();
+                } else {
+                    scoreDisplay.textContent = '';
+                }
+                document.querySelectorAll('.sentence-item').forEach(item => {
+                    if (item._quizData) {
+                        const { input, checkBtn, resultSpan } = item._quizData;
+                        if (input) { input.disabled = false;
+                            input.className = 'quiz-input';
+                            input.value = ''; }
+                        if (checkBtn) checkBtn.disabled = false;
+                        if (resultSpan) { resultSpan.textContent = '';
+                            resultSpan.className = 'quiz-result'; }
+                    }
+                });
+                applyQuizMode();
+            });
+
+            // ── Reset Button ──
+            resetButton.addEventListener('click', function() {
+                quizScore = { correct: 0, incorrect: 0 };
+                updateScore();
+                document.querySelectorAll('.sentence-item').forEach(item => {
+                    if (item._quizData) {
+                        const { input, checkBtn, resultSpan } = item._quizData;
+                        if (input) { input.disabled = false;
+                            input.className = 'quiz-input';
+                            input.value = ''; }
+                        if (checkBtn) checkBtn.disabled = false;
+                        if (resultSpan) { resultSpan.textContent = '';
+                            resultSpan.className = 'quiz-result'; }
+                    }
+                });
+                document.querySelectorAll('.quiz-input').forEach(el => {
+                    el.className = 'quiz-input';
+                    el.value = '';
+                    el.disabled = false;
+                });
+                document.querySelectorAll('.quiz-result').forEach(el => {
+                    el.textContent = '';
+                    el.className = 'quiz-result';
+                });
+                document.querySelectorAll('.quiz-check-btn').forEach(el => {
+                    el.disabled = false;
+                });
+            });
+
+            // ── Keyboard shortcuts ──
+            document.addEventListener('keydown', (e) => {
+                if (e.altKey && e.key === 'f') {
+                    e.preventDefault();
+                    furiganaToggle.checked = !furiganaToggle.checked;
+                    applyFurigana();
+                }
+                if (e.altKey && e.key === 'r') {
+                    e.preventDefault();
+                    translationToggle.click();
+                }
+                if (e.altKey && e.key === 't') {
+                    e.preventDefault();
+                    ttsToggle.click();
+                }
+                if (e.altKey && e.key === 'q') {
+                    e.preventDefault();
+                    quizToggle.click();
+                }
+                if (e.altKey && e.key === 'o') {
+                    e.preventDefault();
+                    focusToggle.click();
+                }
+            });
+
+            // ── Service Worker Registration ──
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(() => console.log('Service Worker registered'))
+                    .catch(() => console.log('Service Worker registration failed'));
+            }
+
+            // ── Init ──
+            attachTTS();
+            updateScore();
+
+            // Activate first sheet
+            document.querySelector('.sheet.active')?.classList.remove('active');
+            document.getElementById('sheet-counters')?.classList.add('active');
+
+            // Apply furigana state after sheets are rendered
+            setTimeout(applyFurigana, 50);
+
+        })();
+    </script>
+
+</body>
+</html>
