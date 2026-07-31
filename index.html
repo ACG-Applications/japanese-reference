@@ -177,6 +177,14 @@
         background: #c92a2a;
       }
 
+      /* ─── make table cells feel clickable ─── */
+      td[data-jp-tts] {
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      td[data-jp-tts]:hover {
+        background: #e8f0fe !important;
+      }
       /* ─── FOCUS MODE ─── */
       .focus-mode .tabs,
       .focus-mode .sheet h2,
@@ -510,40 +518,50 @@
           grid-template-columns: 1fr 1fr;
         }
       }
+
       /* ─── RUBY (FIXED!) ─── */
-      /* Furigana ON - proper ruby rendering */
+      /* Most aggressive approach - position absolute */
       ruby {
         display: inline-block;
-        ruby-align: center;
+        position: relative;
         vertical-align: middle;
-        line-height: 1.4;
+        line-height: 2.8; /* Controls vertical spacing around ruby text */
+        text-align: center;
       }
       rt {
+        /* Furigana text styling */
         display: block;
-        font-size: 0.55rem;
-        line-height: 1;
+        position: absolute;
+        top: 0rem; /* Adjust this to move furigana up/down -1rem, -0.8rem) = moves furigana UP (above the kanji) 0.5rem, 1rem) = moves furigana DOWN (below the kanji)*/
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.75rem; /* ← This controls FURIGANA SIZE */
+        line-height: 1.2; /* Controls spacing inside furigana if multi-line */
         letter-spacing: 0.3px;
-        color: #2d6a4f;
+        color: #8b0000;
         font-weight: 600;
+        white-space: nowrap;
         text-align: center;
-        margin-bottom: 0.1rem;
       }
-      /* Ensure kanji is below furigana */
-      ruby .kanji {
+      rb {
         display: inline-block;
-        line-height: 1.4;
+        line-height: 1.8;
+        margin-top: 0.5rem;
+        font-size: 1.1rem; /* ← Change this to adjust KANJI/KANA size (default: inherit) */
       }
 
       /* Furigana OFF - completely hide ruby */
       .no-furigana ruby {
         display: inline !important;
-        ruby-align: unset !important;
+        position: unset !important;
+        line-height: unset !important;
       }
       .no-furigana rt {
         display: none !important;
       }
-      .no-furigana ruby .kanji {
+      .no-furigana rb {
         display: inline !important;
+        margin-top: 0 !important;
       }
 
       /* ─── TRANSLATION TOGGLE ─── */
@@ -1816,35 +1834,64 @@
           subtitle: "time",
           tables: [
             {
-              headers: ["朝", "昼", "夜", "午前", "午後"],
-              rows: [["あさ", "ひる", "よる", "ごぜん", "ごご"]],
+              headers: [
+                '朝<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">morning</span>',
+                '昼<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">afternoon</span>',
+                '夜<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">night</span>',
+                '午前<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">AM</span>',
+                '午後<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">PM</span>',
+              ],
+              rows: [
+                [
+                  "<ruby>朝<rt>あさ</rt></ruby>",
+                  "<ruby>昼<rt>ひる</rt></ruby>",
+                  "<ruby>夜<rt>よる</rt></ruby>",
+                  "<ruby>午前<rt>ごぜん</rt></ruby>",
+                  "<ruby>午後<rt>ごご</rt></ruby>",
+                ],
+              ],
             },
             {
               headers: ["1:00", "2:00", "3:00", "4:00", "5:00", "6:00"],
-              rows: [["いちじ", "にじ", "さんじ", "よじ", "ごじ", "ろくじ"]],
+              rows: [
+                [
+                  "<ruby>１時<rt>いちじ</rt></ruby>",
+                  "<ruby>２時<rt>にじ</rt></ruby>",
+                  "<ruby>３時<rt>さんじ</rt></ruby>",
+                  "<ruby>４時<rt>よじ</rt></ruby>",
+                  "<ruby>５時<rt>ごじ</rt></ruby>",
+                  "<ruby>６時<rt>ろくじ</rt></ruby>",
+                ],
+              ],
             },
             {
               headers: ["7:00", "8:00", "9:00", "10:00", "11:00", "12:00"],
               rows: [
                 [
-                  "しちじ",
-                  "はちじ",
-                  "くじ",
-                  "じゅうじ",
-                  "じゅういちじ",
-                  "じゅうにじ",
+                  "<ruby>７時<rt>しちじ</rt></ruby>",
+                  "<ruby>８時<rt>はちじ</rt></ruby>",
+                  "<ruby>９時<rt>くじ</rt></ruby>",
+                  "<ruby>１０時<rt>じゅうじ</rt></ruby>",
+                  "<ruby>１１時<rt>じゅういちじ</rt></ruby>",
+                  "<ruby>１２時<rt>じゅうにじ</rt></ruby>",
                 ],
               ],
             },
             {
-              headers: ["いつ", "なんじ", "〜じ", "〜はん", "〜ごろ"],
+              headers: [
+                'いつ<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">when</span>',
+                'なんじ<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">what time</span>',
+                '〜じ<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">o\'clock</span>',
+                '〜はん<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">half past</span>',
+                '〜ごろ<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">about</span>',
+              ],
               rows: [
                 [
-                  '<span class="en-label">when</span>',
-                  '<span class="en-label">what time</span>',
-                  '<span class="en-label">o\'clock</span>',
-                  '<span class="en-label">half past</span>',
-                  '<span class="en-label">about</span>',
+                  "<ruby>何時<rt>いつ</rt></ruby>",
+                  "<ruby>何時<rt>なんじ</rt></ruby>",
+                  "〜<ruby>時<rt>じ</rt></ruby>",
+                  "〜<ruby>半<rt>はん</rt></ruby>",
+                  "〜<ruby>頃<rt>ごろ</rt></ruby>",
                 ],
               ],
             },
@@ -1876,70 +1923,87 @@
             },
           ],
         },
-
         duration: {
           title: "時間・場所・量",
           subtitle: "duration, location, quantity",
           tables: [
             {
-              headers: ["１時間", "１日", "１週間", "１ヶ月", "１年"],
-              rows: [
-                [
-                  "いちじかん",
-                  "いちにち",
-                  "いっしゅうかん",
-                  "いっかげつ",
-                  "いちねん",
-                ],
+              headers: [
+                '１時間<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">1 hour</span>',
+                '１日<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">1 day</span>',
+                '１週間<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">1 week</span>',
+                '１ヶ月<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">1 month</span>',
+                '１年<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">1 year</span>',
               ],
-            },
-            {
-              headers: ["何時間", "何日", "何週間", "何ヶ月", "何年"],
               rows: [
                 [
-                  "なんじかん",
-                  "なんにち",
-                  "なんしゅうかん",
-                  "なんかげつ",
-                  "なんねん",
+                  "<ruby>１時間<rt>いちじかん</rt></ruby>",
+                  "<ruby>１日<rt>いちにち</rt></ruby>",
+                  "<ruby>１週間<rt>いっしゅうかん</rt></ruby>",
+                  "<ruby>１ヶ月<rt>いっかげつ</rt></ruby>",
+                  "<ruby>１年<rt>いちねん</rt></ruby>",
                 ],
               ],
             },
             {
               headers: [
-                "上",
-                "前",
-                "中",
-                "下",
-                "後ろ",
-                "外",
-                "近く",
-                "隣",
-                "横",
+                '何時間<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">how many hours</span>',
+                '何日<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">how many days</span>',
+                '何週間<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">how many weeks</span>',
+                '何ヶ月<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">how many months</span>',
+                '何年<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">how many years</span>',
               ],
               rows: [
                 [
-                  "うえ",
-                  "まえ",
-                  "なか",
-                  "した",
-                  "うしろ",
-                  "そと",
-                  "ちかく",
-                  "となり",
-                  "よこ",
+                  "<ruby>何時間<rt>なんじかん</rt></ruby>",
+                  "<ruby>何日<rt>なんにち</rt></ruby>",
+                  "<ruby>何週間<rt>なんしゅうかん</rt></ruby>",
+                  "<ruby>何ヶ月<rt>なんかげつ</rt></ruby>",
+                  "<ruby>何年<rt>なんねん</rt></ruby>",
                 ],
               ],
             },
             {
-              headers: ["たくさん", "すこし", "ちょっと", "あまり", "ぜんぜん"],
+              headers: [
+                '上<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">above</span>',
+                '前<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">in front of</span>',
+                '中<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">inside</span>',
+                '下<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">below</span>',
+                '後ろ<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">behind</span>',
+                '外<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">outside</span>',
+                '近く<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">near</span>',
+                '隣<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">next to</span>',
+                '横<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">beside</span>',
+              ],
               rows: [
                 [
-                  '<span class="en-label">a lot</span>',
-                  '<span class="en-label">a little</span>',
-                  '<span class="en-label">a little</span>',
-                  '<span class="en-label">(not) many</span>',
-                  '<span class="en-label">(not) at all</span>',
+                  "<ruby>上<rt>うえ</rt></ruby>",
+                  "<ruby>前<rt>まえ</rt></ruby>",
+                  "<ruby>中<rt>なか</rt></ruby>",
+                  "<ruby>下<rt>した</rt></ruby>",
+                  "<ruby>後ろ<rt>うしろ</rt></ruby>",
+                  "<ruby>外<rt>そと</rt></ruby>",
+                  "<ruby>近く<rt>ちかく</rt></ruby>",
+                  "<ruby>隣<rt>となり</rt></ruby>",
+                  "<ruby>横<rt>よこ</rt></ruby>",
+                ],
+              ],
+            },
+            {
+              headers: [
+                'たくさん<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">a lot</span>',
+                'すこし<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">a little</span>',
+                'ちょっと<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">a little</span>',
+                'あまり<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">(not) many</span>',
+                'ぜんぜん<br><span class="en-label" style="font-size:0.6rem;font-weight:400;color:#4a453c;">(not) at all</span>',
+              ],
+              rows: [
+                [
+                  "<ruby>たくさん<rt>たくさん</rt></ruby>",
+                  "<ruby>少し<rt>すこし</rt></ruby>",
+                  "<ruby>ちょっと<rt>ちょっと</rt></ruby>",
+                  "<ruby>あまり<rt>あまり</rt></ruby>",
+                  "<ruby>全然<rt>ぜんぜん</rt></ruby>",
                 ],
               ],
             },
@@ -3049,19 +3113,28 @@
 
           // ─── COMBINED PATTERNS ───
           combinedSentences: [
-            { jp: "公園で本を読みました", en: "I read a book at the park." },
-            { jp: "バスで学校へ行きます", en: "I go to school by bus." },
             {
-              jp: "友達にプレゼントをあげました",
+              jp: "<ruby>公園<rt>こうえん</rt></ruby>で<ruby>本<rt>ほん</rt></ruby>を<ruby>読<rt>よ</rt></ruby>みました",
+              en: "I read a book at the park.",
+            },
+            {
+              jp: "<ruby>バス<rt>ばす</rt></ruby>で<ruby>学校<rt>がっこう</rt></ruby>へ<ruby>行<rt>い</rt></ruby>きます",
+              en: "I go to school by bus.",
+            },
+            {
+              jp: "<ruby>友達<rt>ともだち</rt></ruby>にプレゼントをあげました",
               en: "I gave a present to my friend.",
             },
             {
-              jp: "学校で日本語が好きになりました",
+              jp: "<ruby>学校<rt>がっこう</rt></ruby>で<ruby>日本語<rt>にほんご</rt></ruby>が<ruby>好<rt>す</rt></ruby>きになりました",
               en: "I came to like Japanese at school.",
             },
-            { jp: "コーヒーが欲しいですか？", en: "Do you want coffee?" },
             {
-              jp: "寿司は好きですが、納豆は好きじゃないです",
+              jp: "<ruby>コーヒー<rt>こーひー</rt></ruby>が<ruby>欲<rt>ほ</rt></ruby>しいですか？",
+              en: "Do you want coffee?",
+            },
+            {
+              jp: "<ruby>寿司<rt>すし</rt></ruby>は<ruby>好<rt>す</rt></ruby>きですが、<ruby>納豆<rt>なっとう</rt></ruby>は<ruby>好<rt>す</rt></ruby>きじゃないです",
               en: "I like sushi, but I don't like natto.",
             },
           ],
@@ -3069,61 +3142,61 @@
           // ─── SENTENCES (for quiz mode) ───
           sentences: [
             {
-              jp: "私 (わたし) は 学生 (がくせい) です。",
+              jp: "<ruby>私<rt>わたし</rt></ruby>は <ruby>学生<rt>がくせい</rt></ruby>です。",
               en: "I am a student.",
               answer: "がくせい",
               tts: "わたしはがくせいです。",
             },
             {
-              jp: "私 (わたし) は 本 (ほん) を 読 (よ) みます。",
+              jp: "<ruby>私<rt>わたし</rt></ruby>は <ruby>本<rt>ほん</rt></ruby>を <ruby>読<rt>よ</rt></ruby>みます。",
               en: "I read a book.",
               answer: "よみます",
               tts: "わたしはほんをよみます。",
             },
             {
-              jp: "机 (つくえ) の 上 (うえ) に 本 (ほん) があります。",
+              jp: "<ruby>机<rt>つくえ</rt></ruby>の <ruby>上<rt>うえ</rt></ruby>に <ruby>本<rt>ほん</rt></ruby>があります。",
               en: "There is a book on the desk.",
               answer: "あります",
               tts: "つくえのうえにほんがあります。",
             },
             {
-              jp: "私 (わたし) は 寿司 (すし) が 好きです。",
+              jp: "<ruby>私<rt>わたし</rt></ruby>は <ruby>寿司<rt>すし</rt></ruby>が <ruby>好<rt>す</rt></ruby>きです。",
               en: "I like sushi.",
               answer: "すき",
               tts: "わたしはすしがすきです。",
             },
             {
-              jp: "私 (わたし) は 日本語 (にほんご) が できます。",
+              jp: "<ruby>私<rt>わたし</rt></ruby>は <ruby>日本語<rt>にほんご</rt></ruby>ができます。",
               en: "I can speak Japanese.",
               answer: "できます",
               tts: "わたしはにほんごができます。",
             },
             {
-              jp: "学校 (がっこう) へ 行 (い) きます。",
+              jp: "<ruby>学校<rt>がっこう</rt></ruby>へ <ruby>行<rt>い</rt></ruby>きます。",
               en: "I go to school.",
               answer: "いきます",
               tts: "がっこうへいきます。",
             },
             {
-              jp: "公園 (こうえん) で 本 (ほん) を 読 (よ) みます。",
+              jp: "<ruby>公園<rt>こうえん</rt></ruby>で <ruby>本<rt>ほん</rt></ruby>を <ruby>読<rt>よ</rt></ruby>みます。",
               en: "I read a book at the park.",
               answer: "よみます",
               tts: "こうえんでほんをよみます。",
             },
             {
-              jp: "私 (わたし) は 友達 (ともだち) に 本 (ほん) を あげます。",
+              jp: "<ruby>私<rt>わたし</rt></ruby>は <ruby>友達<rt>ともだち</rt></ruby>に <ruby>本<rt>ほん</rt></ruby>をあげます。",
               en: "I give a book to my friend.",
               answer: "あげます",
               tts: "わたしはともだちにほんをあげます。",
             },
             {
-              jp: "私 (わたし) は コーヒー が 欲 (ほ) しいです。",
+              jp: "<ruby>私<rt>わたし</rt></ruby>は コーヒーが <ruby>欲<rt>ほ</rt></ruby>しいです。",
               en: "I want coffee.",
               answer: "ほしい",
               tts: "わたしはこーひーがほしいです。",
             },
             {
-              jp: "学生 (がくせい) です か？",
+              jp: "<ruby>学生<rt>がくせい</rt></ruby>ですか？",
               en: "Are you a student?",
               answer: "がくせい",
               tts: "がくせいですか。",
@@ -3142,13 +3215,40 @@
         let html = "<table>";
         if (tableData.headers) {
           html += "<thead><tr>";
-          tableData.headers.forEach((h) => (html += `<th>${h}</th>`));
+          tableData.headers.forEach((h) => {
+            // Headers shouldn't be clickable for TTS
+            html += `<th>${h}</th>`;
+          });
           html += "</tr></thead>";
         }
         html += "<tbody>";
         tableData.rows.forEach((row) => {
           html += "<tr>";
-          row.forEach((cell) => (html += `<td>${cell}</td>`));
+          row.forEach((cell) => {
+            // Check if this cell contains Japanese text (not English labels)
+            const hasJapanese = /[\u3040-\u30FF\u4E00-\u9FAF]/.test(cell);
+            const isEnglishOnly =
+              cell.includes("en-label") || cell.includes('class="en"');
+
+            if (hasJapanese && !isEnglishOnly) {
+              // Extract clean text for TTS (remove HTML tags AND furigana)
+              const tempDiv = document.createElement("div");
+              tempDiv.innerHTML = cell;
+              // Remove all ruby tags and their content (rt)
+              const rubyElements = tempDiv.querySelectorAll("ruby");
+              rubyElements.forEach((ruby) => {
+                // Get just the base text (the kanji/kana without furigana)
+                const baseText = ruby.textContent
+                  .replace(/[\u3040-\u309F]+$/, "")
+                  .trim();
+                ruby.textContent = baseText;
+              });
+              const cleanText = tempDiv.textContent.trim();
+              html += `<td data-jp-tts="${cleanText}">${cell}</td>`;
+            } else {
+              html += `<td>${cell}</td>`;
+            }
+          });
           html += "</tr>";
         });
         html += "</tbody></table>";
@@ -3161,14 +3261,29 @@
           '<h3>例文 / Examples</h3><div class="sentence-grid" data-sheet="temp">';
         sentences.forEach((s) => {
           const label = s.label ? `<span class="label">${s.label}</span>` : "";
+          // Use tts if provided, otherwise clean the jp text
+          let cleanText = s.tts || s.jp;
+          if (!s.tts) {
+            // Remove furigana from the text
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = s.jp;
+            const rubyElements = tempDiv.querySelectorAll("ruby");
+            rubyElements.forEach((ruby) => {
+              const baseText = ruby.textContent
+                .replace(/[\u3040-\u309F]+$/, "")
+                .trim();
+              ruby.textContent = baseText;
+            });
+            cleanText = tempDiv.textContent.trim();
+          }
           html += `
-                      <div class="sentence-item" data-answer="${s.answer}" data-jp="${s.jp}">
-                          ${label}
-                          <span class="jp">${s.jp}</span>
-                          <span class="en">${s.en}</span>
-                          <button class="tts-btn" data-text="${s.tts || s.jp.replace(/<[^>]*>/g, "")}">🔊</button>
-                      </div>
-                  `;
+                <div class="sentence-item" data-answer="${s.answer}" data-jp="${s.jp}">
+                    ${label}
+                    <span class="jp" data-jp-tts="${cleanText}">${s.jp}</span>
+                    <span class="en">${s.en}</span>
+                    <button class="tts-btn" data-text="${cleanText}">🔊</button>
+                </div>
+            `;
         });
         html += "</div>";
         return html;
@@ -3196,22 +3311,64 @@
           html += `<div class="extra-sentences-label">例文 / Examples</div>`;
           html += `<div class="extra-sentences-grid">`;
           extra.sentences.forEach((s) => {
+            let cleanText = s.tts || s.jp;
+            if (!s.tts) {
+              // Remove furigana from the text
+              const tempDiv = document.createElement("div");
+              tempDiv.innerHTML = s.jp;
+              const rubyElements = tempDiv.querySelectorAll("ruby");
+              rubyElements.forEach((ruby) => {
+                const baseText = ruby.textContent
+                  .replace(/[\u3040-\u309F]+$/, "")
+                  .trim();
+                ruby.textContent = baseText;
+              });
+              cleanText = tempDiv.textContent.trim();
+            }
             html += `
-                        <div class="sentence-item" data-answer="${s.answer}" data-jp="${s.jp}">
-                            <span class="jp">${s.jp}</span>
-                            <span class="en">${s.en}</span>
-                            <button class="tts-btn" data-text="${s.tts || s.jp.replace(/<[^>]*>/g, "")}">🔊</button>
-                        </div>
-                    `;
+                <div class="sentence-item" data-answer="${s.answer}" data-jp="${s.jp}">
+                    <span class="jp" data-jp-tts="${cleanText}">${s.jp}</span>
+                    <span class="en">${s.en}</span>
+                    <button class="tts-btn" data-text="${cleanText}">🔊</button>
+                </div>
+            `;
           });
           html += `</div></div>`;
         });
         return html;
       }
+
       function buildGrammarCards(cards) {
         if (!cards || cards.length === 0) return "";
         let html = '<div class="grammar-grid">';
         cards.forEach((card) => {
+          // Clean the example text for TTS (remove furigana)
+          let cleanExample = card.example;
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = card.example;
+          const rubyElements = tempDiv.querySelectorAll("ruby");
+          rubyElements.forEach((ruby) => {
+            const baseText = ruby.textContent
+              .replace(/[\u3040-\u309F]+$/, "")
+              .trim();
+            ruby.textContent = baseText;
+          });
+          cleanExample = tempDiv.textContent.trim();
+
+          // Clean all form texts
+          const cleanPoliteAff = card.polite.aff.replace(/<[^>]*>/g, "").trim();
+          const cleanPolitePast = card.polite.past
+            .replace(/<[^>]*>/g, "")
+            .trim();
+          const cleanPoliteNeg = card.polite.neg.replace(/<[^>]*>/g, "").trim();
+          const cleanPolitePneg = card.polite.pneg
+            .replace(/<[^>]*>/g, "")
+            .trim();
+          const cleanPlainAff = card.plain.aff.replace(/<[^>]*>/g, "").trim();
+          const cleanPlainPast = card.plain.past.replace(/<[^>]*>/g, "").trim();
+          const cleanPlainNeg = card.plain.neg.replace(/<[^>]*>/g, "").trim();
+          const cleanPlainPneg = card.plain.pneg.replace(/<[^>]*>/g, "").trim();
+
           html += `
       <div class="grammar-card">
         <div class="grammar-card-header">#${card.id} ${card.title} <span class="grammar-sub">${card.subtitle}</span></div>
@@ -3219,20 +3376,20 @@
         <div class="grammar-forms">
           <div class="grammar-form-col">
             <div class="grammar-form-label">POLITE (です・ます)</div>
-            <div><span class="grammar-row-label">AFF:</span> <span class="grammar-jp">${card.polite.aff}</span></div>
-            <div><span class="grammar-row-label">PAST:</span> <span class="grammar-jp">${card.polite.past}</span></div>
-            <div><span class="grammar-row-label">NEG:</span> <span class="grammar-jp">${card.polite.neg}</span></div>
-            <div><span class="grammar-row-label">P-NEG:</span> <span class="grammar-jp">${card.polite.pneg}</span></div>
+            <div><span class="grammar-row-label">AFF:</span> <span class="grammar-jp" data-jp-tts="${cleanPoliteAff}">${card.polite.aff}</span></div>
+            <div><span class="grammar-row-label">PAST:</span> <span class="grammar-jp" data-jp-tts="${cleanPolitePast}">${card.polite.past}</span></div>
+            <div><span class="grammar-row-label">NEG:</span> <span class="grammar-jp" data-jp-tts="${cleanPoliteNeg}">${card.polite.neg}</span></div>
+            <div><span class="grammar-row-label">P-NEG:</span> <span class="grammar-jp" data-jp-tts="${cleanPolitePneg}">${card.polite.pneg}</span></div>
           </div>
           <div class="grammar-form-col">
             <div class="grammar-form-label">PLAIN (だ・る)</div>
-            <div><span class="grammar-row-label">AFF:</span> <span class="grammar-jp">${card.plain.aff}</span></div>
-            <div><span class="grammar-row-label">PAST:</span> <span class="grammar-jp">${card.plain.past}</span></div>
-            <div><span class="grammar-row-label">NEG:</span> <span class="grammar-jp">${card.plain.neg}</span></div>
-            <div><span class="grammar-row-label">P-NEG:</span> <span class="grammar-jp">${card.plain.pneg}</span></div>
+            <div><span class="grammar-row-label">AFF:</span> <span class="grammar-jp" data-jp-tts="${cleanPlainAff}">${card.plain.aff}</span></div>
+            <div><span class="grammar-row-label">PAST:</span> <span class="grammar-jp" data-jp-tts="${cleanPlainPast}">${card.plain.past}</span></div>
+            <div><span class="grammar-row-label">NEG:</span> <span class="grammar-jp" data-jp-tts="${cleanPlainNeg}">${card.plain.neg}</span></div>
+            <div><span class="grammar-row-label">P-NEG:</span> <span class="grammar-jp" data-jp-tts="${cleanPlainPneg}">${card.plain.pneg}</span></div>
           </div>
         </div>
-        <div class="grammar-example">
+        <div class="grammar-example" data-jp-tts="${cleanExample}">
           ${card.example}<br>
           <span class="grammar-example-en">→ ${card.exampleEn}</span>
         </div>
@@ -3275,9 +3432,23 @@
         let html = "<h3>🔗 Combined Patterns (Real Sentences)</h3>";
         html += '<div class="combined-grid">';
         sentences.forEach((s) => {
+          // Clean the Japanese text for TTS (remove HTML tags but keep furigana content)
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = s.jp;
+          // Remove ruby tags but keep the base text for TTS
+          const rubyElements = tempDiv.querySelectorAll("ruby");
+          rubyElements.forEach((ruby) => {
+            // Get just the base text without furigana
+            const baseText = ruby.textContent
+              .replace(/[\u3040-\u309F]+$/, "")
+              .trim();
+            ruby.textContent = baseText;
+          });
+          const cleanText = tempDiv.textContent.trim();
+
           html += `
-      <div class="comb-item">
-        <div class="jp-comb">${s.jp}</div>
+      <div class="comb-item" data-jp-tts="${cleanText}">
+        <div class="jp-comb" data-jp-tts="${cleanText}">${s.jp}</div>
         <div style="font-size: 0.85rem; color: #4a453c;">${s.en}</div>
       </div>
     `;
@@ -3285,6 +3456,7 @@
         html += "</div>";
         return html;
       }
+
       function buildSheet(id, data) {
         let html = `<section class="sheet" id="sheet-${id}">`;
         html += `<h2>${data.title} <span class="sub">${data.subtitle}</span></h2>`;
@@ -3416,17 +3588,42 @@
           window.speechSynthesis.getVoices();
         };
 
-        function attachTTS() {
-          document.querySelectorAll(".tts-btn").forEach((btn) => {
-            btn.removeEventListener("click", ttsHandler);
-            btn.addEventListener("click", ttsHandler);
-          });
-        }
-
-        function ttsHandler(e) {
+        // Handle speaker button clicks
+        function ttsButtonHandler(e) {
           e.stopPropagation();
           const text = this.dataset.text;
           if (text) speakText(text);
+        }
+
+        // Handle click-to-speak on any element with data-jp-tts
+        function tableTTSHandler(e) {
+          if (!ttsEnabled) return;
+          const target = e.target.closest("[data-jp-tts]");
+          if (!target) return;
+
+          // Don't trigger if clicking on a button or input
+          if (e.target.closest("button") || e.target.closest("input")) return;
+
+          // Get the text to speak
+          let text = target.dataset.jpTts;
+          if (!text) {
+            // Try to get text from the cell's content
+            text = target.textContent.trim();
+          }
+
+          if (text) speakText(text);
+        }
+
+        function attachTTS() {
+          // Remove old handlers to avoid duplicates
+          document.removeEventListener("click", tableTTSHandler);
+          document.addEventListener("click", tableTTSHandler);
+
+          // Attach speaker button handlers
+          document.querySelectorAll(".tts-btn").forEach((btn) => {
+            btn.removeEventListener("click", ttsButtonHandler);
+            btn.addEventListener("click", ttsButtonHandler);
+          });
         }
 
         ttsToggle.addEventListener("click", function () {
@@ -3504,6 +3701,22 @@
               }
               jpSpan.innerHTML = newHTML;
 
+              // Preserve TTS data on the jpSpan (remove furigana)
+              if (item.dataset.jp) {
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = item.dataset.jp;
+                const rubyElements = tempDiv.querySelectorAll("ruby");
+                rubyElements.forEach((ruby) => {
+                  // Extract just the base text without furigana
+                  const baseText = ruby.textContent
+                    .replace(/[\u3040-\u309F]+$/, "")
+                    .trim();
+                  ruby.textContent = baseText;
+                });
+                const cleanText = tempDiv.textContent.trim();
+                jpSpan.dataset.jpTts = cleanText;
+              }
+
               const input = document.createElement("input");
               input.type = "text";
               input.className = "quiz-input";
@@ -3559,6 +3772,18 @@
               const jpSpan = item.querySelector(".jp");
               if (jpSpan && item.dataset.jp) {
                 jpSpan.innerHTML = item.dataset.jp;
+                // Restore TTS data without furigana
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = item.dataset.jp;
+                const rubyElements = tempDiv.querySelectorAll("ruby");
+                rubyElements.forEach((ruby) => {
+                  const baseText = ruby.textContent
+                    .replace(/[\u3040-\u309F]+$/, "")
+                    .trim();
+                  ruby.textContent = baseText;
+                });
+                const cleanText = tempDiv.textContent.trim();
+                jpSpan.dataset.jpTts = cleanText;
                 applyFurigana();
               }
             }
