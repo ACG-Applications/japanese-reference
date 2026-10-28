@@ -922,6 +922,97 @@
           title: "カウンター",
           subtitle: "～つ / ～こ / ～にん / ～さつ / ～ほん / ～まい / ～さい",
 
+          // ─── NEW: WHICH COUNTER SHOULD I USE? ───
+          counterDecisionTable: {
+            headers: ["Category", "Counter", "What it counts", "Example"],
+            rows: [
+              [
+                "General objects",
+                "<strong>～<ruby>つ<rt>つ</rt></ruby> / ～<ruby>こ<rt>こ</rt></ruby></strong>",
+                "Anything, or small solid items",
+                "<ruby>林檎<rt>りんご</rt></ruby>を<ruby>一<rt>ひと</rt></ruby>つ (one apple)",
+              ],
+              [
+                "People",
+                "<strong>～<ruby>人<rt>にん</rt></ruby></strong>",
+                "People",
+                "<ruby>学生<rt>がくせい</rt></ruby>が<ruby>二<rt>ふた</rt></ruby>り (two students)",
+              ],
+              [
+                "Books/bound",
+                "<strong>～<ruby>冊<rt>さつ</rt></ruby></strong>",
+                "Books, notebooks, magazines",
+                "<ruby>本<rt>ほん</rt></ruby>を<ruby>三<rt>さん</rt></ruby>さつ (three books)",
+              ],
+              [
+                "Long/skinny",
+                "<strong>～<ruby>本<rt>ほん</rt></ruby></strong>",
+                "Pencils, bottles, trees, trains",
+                "<ruby>鉛筆<rt>えんぴつ</rt></ruby>を<ruby>五<rt>ご</rt></ruby>ほん (five pencils)",
+              ],
+              [
+                "Flat",
+                "<strong>～<ruby>枚<rt>まい</rt></ruby></strong>",
+                "Paper, stamps, shirts, tickets",
+                "<ruby>切手<rt>きって</rt></ruby>を<ruby>二<rt>に</rt></ruby>まい (two stamps)",
+              ],
+              [
+                "Age",
+                "<strong>～<ruby>歳<rt>さい</rt></ruby></strong>",
+                "Years old",
+                "<ruby>十歳<rt>じゅっさい</rt></ruby> (10 years old)",
+              ],
+              [
+                "Cups/glasses",
+                "<strong>～<ruby>杯<rt>はい</rt></ruby></strong>",
+                "<strong>Contents of a cup, glass, or bowl</strong>",
+                "コーヒーを<ruby>二杯<rt>にはい</rt></ruby> (two cups of coffee)",
+              ],
+              [
+                "Animals (small)",
+                "<strong>～<ruby>匹<rt>ひき</rt></ruby></strong>",
+                "Dogs, cats, fish, insects",
+                "<ruby>犬<rt>いぬ</rt></ruby>が<ruby>三匹<rt>さんびき</rt></ruby> (three dogs)",
+              ],
+              [
+                "Animals (birds)",
+                "<strong>～<ruby>羽<rt>わ</rt></ruby></strong>",
+                "Birds, rabbits",
+                "<ruby>鳥<rt>とり</rt></ruby>が<ruby>二羽<rt>にわ</rt></ruby> (two birds)",
+              ],
+              [
+                "Machines/vehicles",
+                "<strong>～<ruby>台<rt>だい</rt></ruby></strong>",
+                "Cars, bikes, computers, appliances",
+                "<ruby>車<rt>くるま</rt></ruby>が<ruby>一台<rt>いちだい</rt></ruby> (one car)",
+              ],
+              [
+                "Clothing",
+                "<strong>～<ruby>着<rt>ちゃく</rt></ruby></strong>",
+                "Shirts, suits, dresses",
+                "シャツを<ruby>三着<rt>さんちゃく</rt></ruby> (three shirts)",
+              ],
+              [
+                "Pairs (footwear)",
+                "<strong>～<ruby>足<rt>そく</rt></ruby></strong>",
+                "Shoes, socks",
+                "<ruby>靴<rt>くつ</rt></ruby>を<ruby>二足<rt>にそく</rt></ruby> (two pairs of shoes)",
+              ],
+              [
+                "Times",
+                "<strong>～<ruby>回<rt>かい</rt></ruby></strong>",
+                "Occurrences",
+                "<ruby>三回<rt>さんかい</rt></ruby><ruby>行<rt>い</rt></ruby>った (went three times)",
+              ],
+              [
+                "Floors",
+                "<strong>～<ruby>階<rt>かい</rt></ruby></strong>",
+                "Building floors",
+                "<ruby>五階<rt>ごかい</rt></ruby> (5th floor)",
+              ],
+            ],
+          },
+
           // ─── MAIN TABLE: Core 7 counters ───
           table: {
             headers: [
@@ -1130,6 +1221,12 @@
                   en: "I drank 3 glasses of water.",
                   answer: "さんばい",
                   tts: "みずをさんばいのみました。",
+                },
+                {
+                  jp: "毎日（まいにち）コーヒーを<ruby>二<rt>に</rt></ruby><ruby>杯<rt>はい</rt></ruby><ruby>飲<rt>の</rt></ruby>みます。",
+                  en: "I drink 2 cups of coffee every day.",
+                  answer: "にはい",
+                  tts: "まいにちこーひーをにはいのみます。",
                 },
               ],
             },
@@ -3277,13 +3374,13 @@
             cleanText = tempDiv.textContent.trim();
           }
           html += `
-                <div class="sentence-item" data-answer="${s.answer}" data-jp="${s.jp}">
-                    ${label}
-                    <span class="jp" data-jp-tts="${cleanText}">${s.jp}</span>
-                    <span class="en">${s.en}</span>
-                    <button class="tts-btn" data-text="${cleanText}">🔊</button>
-                </div>
-            `;
+                    <div class="sentence-item" data-answer="${s.answer}" data-jp="${s.jp}">
+                        ${label}
+                        <span class="jp" data-jp-tts="${cleanText}">${s.jp}</span>
+                        <span class="en">${s.en}</span>
+                        <button class="tts-btn" data-text="${cleanText}">🔊</button>
+                    </div>
+                `;
         });
         html += "</div>";
         return html;
@@ -3291,10 +3388,22 @@
 
       function buildExtraTables(extraTables) {
         if (!extraTables || extraTables.length === 0) return "";
-        let html = "";
+
+        // 1. Create the accordion wrapper
+        let html = `
+        <details class="extra-counters-accordion" style="margin-top: 2rem; border: 1px solid #d6d0c6; border-radius: 12px; background: #fff; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+          <summary style="cursor: pointer; padding: 15px 20px; background: #2d6a4f; color: white; font-size: 1.1rem; font-weight: bold; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+            <span>➕ Expand: Additional Counters (回, 階, 杯, 匹, 羽, etc.)</span>
+            <span style="font-size: 0.8rem; font-weight: 400; opacity: 0.8;">Click to show</span>
+          </summary>
+          <div style="padding: 20px; display: flex; flex-direction: column; gap: 20px;">
+      `;
+
+        // 2. Loop through the extra tables
         extraTables.forEach((extra) => {
-          html += `<div class="extra-counter-block">`;
-          html += `<h3>${extra.title} <span class="sub">${extra.subtitle}</span></h3>`;
+          // Note: I removed the class "extra-counter-block" border-top so it looks cleaner inside the accordion
+          html += `<div style="padding-bottom: 15px; border-bottom: 1px dashed #e8e4dc;">`;
+          html += `<h3>${extra.title} <span class="sub" style="font-weight: 400; font-size: 0.9rem; color: #666;">${extra.subtitle}</span></h3>`;
 
           // Readings row
           html += `<div class="readings-row">`;
@@ -3313,7 +3422,6 @@
           extra.sentences.forEach((s) => {
             let cleanText = s.tts || s.jp;
             if (!s.tts) {
-              // Remove furigana from the text
               const tempDiv = document.createElement("div");
               tempDiv.innerHTML = s.jp;
               const rubyElements = tempDiv.querySelectorAll("ruby");
@@ -3326,18 +3434,24 @@
               cleanText = tempDiv.textContent.trim();
             }
             html += `
-                <div class="sentence-item" data-answer="${s.answer}" data-jp="${s.jp}">
-                    <span class="jp" data-jp-tts="${cleanText}">${s.jp}</span>
-                    <span class="en">${s.en}</span>
-                    <button class="tts-btn" data-text="${cleanText}">🔊</button>
-                </div>
-            `;
+              <div class="sentence-item" data-answer="${s.answer}" data-jp="${s.jp}">
+                  <span class="jp" data-jp-tts="${cleanText}">${s.jp}</span>
+                  <span class="en">${s.en}</span>
+                  <button class="tts-btn" data-text="${cleanText}">🔊</button>
+              </div>
+          `;
           });
           html += `</div></div>`;
         });
+
+        // 3. Close the accordion wrapper
+        html += `
+          </div>
+        </details>
+      `;
+
         return html;
       }
-
       function buildGrammarCards(cards) {
         if (!cards || cards.length === 0) return "";
         let html = '<div class="grammar-grid">';
@@ -3370,32 +3484,32 @@
           const cleanPlainPneg = card.plain.pneg.replace(/<[^>]*>/g, "").trim();
 
           html += `
-      <div class="grammar-card">
-        <div class="grammar-card-header">#${card.id} ${card.title} <span class="grammar-sub">${card.subtitle}</span></div>
-        <div class="grammar-meaning"><strong>Meaning:</strong> ${card.meaning} &nbsp;|&nbsp; <strong>Particle:</strong> ${card.particles}</div>
-        <div class="grammar-forms">
-          <div class="grammar-form-col">
-            <div class="grammar-form-label">POLITE (です・ます)</div>
-            <div><span class="grammar-row-label">AFF:</span> <span class="grammar-jp" data-jp-tts="${cleanPoliteAff}">${card.polite.aff}</span></div>
-            <div><span class="grammar-row-label">PAST:</span> <span class="grammar-jp" data-jp-tts="${cleanPolitePast}">${card.polite.past}</span></div>
-            <div><span class="grammar-row-label">NEG:</span> <span class="grammar-jp" data-jp-tts="${cleanPoliteNeg}">${card.polite.neg}</span></div>
-            <div><span class="grammar-row-label">P-NEG:</span> <span class="grammar-jp" data-jp-tts="${cleanPolitePneg}">${card.polite.pneg}</span></div>
+          <div class="grammar-card">
+            <div class="grammar-card-header">#${card.id} ${card.title} <span class="grammar-sub">${card.subtitle}</span></div>
+            <div class="grammar-meaning"><strong>Meaning:</strong> ${card.meaning} &nbsp;|&nbsp; <strong>Particle:</strong> ${card.particles}</div>
+            <div class="grammar-forms">
+              <div class="grammar-form-col">
+                <div class="grammar-form-label">POLITE (です・ます)</div>
+                <div><span class="grammar-row-label">AFF:</span> <span class="grammar-jp" data-jp-tts="${cleanPoliteAff}">${card.polite.aff}</span></div>
+                <div><span class="grammar-row-label">PAST:</span> <span class="grammar-jp" data-jp-tts="${cleanPolitePast}">${card.polite.past}</span></div>
+                <div><span class="grammar-row-label">NEG:</span> <span class="grammar-jp" data-jp-tts="${cleanPoliteNeg}">${card.polite.neg}</span></div>
+                <div><span class="grammar-row-label">P-NEG:</span> <span class="grammar-jp" data-jp-tts="${cleanPolitePneg}">${card.polite.pneg}</span></div>
+              </div>
+              <div class="grammar-form-col">
+                <div class="grammar-form-label">PLAIN (だ・る)</div>
+                <div><span class="grammar-row-label">AFF:</span> <span class="grammar-jp" data-jp-tts="${cleanPlainAff}">${card.plain.aff}</span></div>
+                <div><span class="grammar-row-label">PAST:</span> <span class="grammar-jp" data-jp-tts="${cleanPlainPast}">${card.plain.past}</span></div>
+                <div><span class="grammar-row-label">NEG:</span> <span class="grammar-jp" data-jp-tts="${cleanPlainNeg}">${card.plain.neg}</span></div>
+                <div><span class="grammar-row-label">P-NEG:</span> <span class="grammar-jp" data-jp-tts="${cleanPlainPneg}">${card.plain.pneg}</span></div>
+              </div>
+            </div>
+            <div class="grammar-example" data-jp-tts="${cleanExample}">
+              ${card.example}<br>
+              <span class="grammar-example-en">→ ${card.exampleEn}</span>
+            </div>
+            <div class="grammar-tips">💡 ${card.tip}</div>
           </div>
-          <div class="grammar-form-col">
-            <div class="grammar-form-label">PLAIN (だ・る)</div>
-            <div><span class="grammar-row-label">AFF:</span> <span class="grammar-jp" data-jp-tts="${cleanPlainAff}">${card.plain.aff}</span></div>
-            <div><span class="grammar-row-label">PAST:</span> <span class="grammar-jp" data-jp-tts="${cleanPlainPast}">${card.plain.past}</span></div>
-            <div><span class="grammar-row-label">NEG:</span> <span class="grammar-jp" data-jp-tts="${cleanPlainNeg}">${card.plain.neg}</span></div>
-            <div><span class="grammar-row-label">P-NEG:</span> <span class="grammar-jp" data-jp-tts="${cleanPlainPneg}">${card.plain.pneg}</span></div>
-          </div>
-        </div>
-        <div class="grammar-example" data-jp-tts="${cleanExample}">
-          ${card.example}<br>
-          <span class="grammar-example-en">→ ${card.exampleEn}</span>
-        </div>
-        <div class="grammar-tips">💡 ${card.tip}</div>
-      </div>
-    `;
+        `;
         });
         html += "</div>";
         return html;
@@ -3409,7 +3523,27 @@
         html += "</tr></thead><tbody>";
         matrix.rows.forEach((row) => {
           html += "<tr>";
-          row.forEach((cell) => (html += `<td>${cell}</td>`));
+          row.forEach((cell) => {
+            const hasJapanese = /[\u3040-\u30FF\u4E00-\u9FAF]/.test(cell);
+            const isEnglishOnly =
+              cell.includes("en-label") || cell.includes('class="en"');
+
+            if (hasJapanese && !isEnglishOnly) {
+              const tempDiv = document.createElement("div");
+              tempDiv.innerHTML = cell;
+              const rubyElements = tempDiv.querySelectorAll("ruby");
+              rubyElements.forEach((ruby) => {
+                const baseText = ruby.textContent
+                  .replace(/[\u3040-\u309F]+$/, "")
+                  .trim();
+                ruby.textContent = baseText;
+              });
+              const cleanText = tempDiv.textContent.trim();
+              html += `<td data-jp-tts="${cleanText}">${cell}</td>`;
+            } else {
+              html += `<td>${cell}</td>`;
+            }
+          });
           html += "</tr>";
         });
         html += "</tbody></table>";
@@ -3447,11 +3581,11 @@
           const cleanText = tempDiv.textContent.trim();
 
           html += `
-      <div class="comb-item" data-jp-tts="${cleanText}">
-        <div class="jp-comb" data-jp-tts="${cleanText}">${s.jp}</div>
-        <div style="font-size: 0.85rem; color: #4a453c;">${s.en}</div>
-      </div>
-    `;
+          <div class="comb-item" data-jp-tts="${cleanText}">
+            <div class="jp-comb" data-jp-tts="${cleanText}">${s.jp}</div>
+            <div style="font-size: 0.85rem; color: #4a453c;">${s.en}</div>
+          </div>
+        `;
         });
         html += "</div>";
         return html;
@@ -3475,6 +3609,11 @@
         // ─── GRAMMAR CARDS ───
         if (data.grammarCards) {
           html += buildGrammarCards(data.grammarCards);
+        }
+
+        // ─── COUNTER DECISION TABLE ───
+        if (data.counterDecisionTable) {
+          html += buildSummaryMatrix(data.counterDecisionTable);
         }
 
         // ─── SUMMARY MATRIX ───
