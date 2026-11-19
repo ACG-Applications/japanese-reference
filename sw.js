@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jp-reference-v2';
+const CACHE_NAME = 'jp-reference-v3';
 const ASSETS = [
   'index.html',
   'manifest.json',

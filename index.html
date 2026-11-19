@@ -671,6 +671,22 @@
         border-bottom-color: #c92a2a;
         background: #f8d7da;
       }
+      .quiz-select {
+        border: none;
+        border-bottom: 2px solid #2d6a4f;
+        background: #ffffff;
+        font-size: 0.95rem;
+        font-family: inherit;
+        padding: 0.1rem 0.2rem;
+        color: #000000;
+        font-weight: 600;
+        cursor: pointer;
+        outline: none;
+      }
+
+      .quiz-select.correct { border-bottom-color: #2e7d32; color: #2e7d32; }
+      .quiz-select.incorrect { border-bottom-color: #c62828; color: #c62828; }
+
       .quiz-check-btn {
         background: #2d6a4f;
         color: white;
@@ -3816,9 +3832,102 @@
               : "";
         }
 
+        // The quiz answer is the whole reading of a counted phrase (e.g. さんかい for
+        // ３回), which spans several <ruby> elements. Find the run whose readings spell
+        // the answer so the blank covers all of it, not just the first character.
+        // The quiz answer is the reading of a phrase, e.g. さんかい for ３回 or たべます
+        // for 食べます. Build the sentence's full reading (ruby readings spliced with the
+        // plain kana between them) while remembering which source range each character
+        // came from, then blank exactly the range the answer covers.
+        function buildQuizBlankHTML(jpHTML, answer) {
+          const isSpace = (ch) => /[\s\u3000]/.test(ch);
+          // Sentences mix ゴム (katakana) with answers written in hiragana, so compare
+          // with katakana folded to hiragana. Both strings stay 1:1 with the source.
+          const fold = (s) =>
+            String(s).replace(/[\u30A1-\u30F6]/g, (c) =>
+              String.fromCharCode(c.charCodeAt(0) - 0x60),
+            );
+          const target = fold(String(answer || "").replace(/[\s\u3000]/g, ""));
+          const fallback = () =>
+            jpHTML.replace(/<ruby>.*?<rt>.*?<\/rt>.*?<\/ruby>/, "_____");
+          if (!target) return fallback();
+
+          const rubyRe = /<ruby>([^<]*)<rt>([^<]*)<\/rt><\/ruby>/g;
+          const readingChars = [];
+          const sourceMap = [];
+          let lastIndex = 0;
+          let m;
+
+          const pushPlain = (text, offset) => {
+            for (let k = 0; k < text.length; k++) {
+              readingChars.push(text[k]);
+              sourceMap.push([offset + k, offset + k + 1]);
+            }
+          };
+
+          while ((m = rubyRe.exec(jpHTML))) {
+            pushPlain(jpHTML.slice(lastIndex, m.index), lastIndex);
+            const reading = m[2];
+            for (let k = 0; k < reading.length; k++) {
+              readingChars.push(reading[k]);
+              // every character of a reading maps to the whole ruby element
+              sourceMap.push([m.index, m.index + m[0].length]);
+            }
+            lastIndex = m.index + m[0].length;
+          }
+          pushPlain(jpHTML.slice(lastIndex), lastIndex);
+
+          // find the answer in the reading, ignoring whitespace, keeping the mapping
+          const positions = [];
+          for (let i = 0; i < readingChars.length; i++) {
+            if (!isSpace(readingChars[i])) positions.push(i);
+          }
+          const flat = fold(positions.map((i) => readingChars[i]).join(""));
+          const at = flat.indexOf(target);
+          if (at < 0) return fallback();
+
+          const firstChar = positions[at];
+          const lastChar = positions[at + target.length - 1];
+          const from = sourceMap[firstChar][0];
+          const to = sourceMap[lastChar][1];
+          return (
+            jpHTML.slice(0, from) +
+            '<span class="quiz-blank">_____</span>' +
+            jpHTML.slice(to)
+          );
+        }
+
+        // Correct answer plus two plausible decoys taken from other quiz items.
+        function buildQuizOptions(answer, pool) {
+          const norm = (s) => String(s).replace(/[\s\u3000]/g, "");
+          const target = norm(answer);
+          let candidates = pool.filter(
+            (a) => a && norm(a) !== target && Math.abs(norm(a).length - target.length) <= 1,
+          );
+          if (candidates.length < 2) {
+            candidates = pool.filter((a) => a && norm(a) !== target);
+          }
+          candidates = Array.from(new Set(candidates));
+          for (let i = candidates.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+          }
+          const options = [answer].concat(candidates.slice(0, 2));
+          for (let i = options.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [options[i], options[j]] = [options[j], options[i]];
+          }
+          return options;
+        }
+
         function applyQuizMode() {
           const activeSheet = document.querySelector(".sheet.active");
           if (!activeSheet) return;
+          const allAnswers = Array.from(
+            document.querySelectorAll(".sentence-item[data-answer]"),
+          )
+            .map((el) => el.dataset.answer)
+            .filter(Boolean);
           const grid = activeSheet.querySelector(".sentence-grid");
           if (!grid) return;
 
@@ -3826,9 +3935,11 @@
 
           const items = grid.querySelectorAll(".sentence-item");
           items.forEach((item) => {
+            const oldSelect = item.querySelector(".quiz-select");
             const oldInput = item.querySelector(".quiz-input");
             const oldBtn = item.querySelector(".quiz-check-btn");
             const oldResult = item.querySelector(".quiz-result");
+            if (oldSelect) oldSelect.remove();
             if (oldInput) oldInput.remove();
             if (oldBtn) oldBtn.remove();
             if (oldResult) oldResult.remove();
@@ -3837,22 +3948,11 @@
               const jpSpan = item.querySelector(".jp");
               if (!jpSpan) return;
               const answer = item.dataset.answer || "";
-              let newHTML = jpSpan.innerHTML;
-              newHTML = newHTML.replace(/<span[^>]*>_____<\/span>/g, "_____");
-              if (answer && newHTML.includes(answer)) {
-                newHTML = newHTML.replace(
-                  answer,
-                  '<span class="quiz-blank">_____</span>',
-                );
-              } else {
-                const match = newHTML.match(
-                  /<ruby>.*?<rt>.*?<\/rt>.*?<\/ruby>/,
-                );
-                if (match) {
-                  newHTML = newHTML.replace(match[0], "_____");
-                }
-              }
-              jpSpan.innerHTML = newHTML;
+              // Always rebuild from the original markup so blanks never accumulate.
+              jpSpan.innerHTML = buildQuizBlankHTML(
+                item.dataset.jp || jpSpan.innerHTML,
+                answer,
+              );
 
               // Preserve TTS data on the jpSpan (remove furigana)
               if (item.dataset.jp) {
@@ -3870,15 +3970,21 @@
                 jpSpan.dataset.jpTts = cleanText;
               }
 
-              const input = document.createElement("input");
-              input.type = "text";
-              input.className = "quiz-input";
-              input.placeholder = "?";
-              input.autocomplete = "off";
-
-              const checkBtn = document.createElement("button");
-              checkBtn.className = "quiz-check-btn";
-              checkBtn.textContent = "Check";
+              const select = document.createElement("select");
+              select.className = "quiz-select";
+              const choices = buildQuizOptions(answer, allAnswers);
+              select.innerHTML =
+                '<option value="">?</option>' +
+                choices
+                  .map(
+                    (c) =>
+                      '<option value="' +
+                      c +
+                      '">' +
+                      c +
+                      "</option>",
+                  )
+                  .join("");
 
               const resultSpan = document.createElement("span");
               resultSpan.className = "quiz-result";
@@ -3886,17 +3992,17 @@
               const wrapper = document.createElement("span");
               wrapper.style.display = "inline-block";
               wrapper.style.marginLeft = "0.5rem";
-              wrapper.appendChild(input);
-              wrapper.appendChild(checkBtn);
+              wrapper.appendChild(select);
               wrapper.appendChild(resultSpan);
 
               jpSpan.parentNode.insertBefore(wrapper, jpSpan.nextSibling);
 
-              function checkAnswer() {
-                const userAnswer = input.value.trim();
+              select.addEventListener("change", function () {
+                const userAnswer = select.value;
+                if (!userAnswer) return;
                 const isCorrect = userAnswer === answer;
-                input.className =
-                  "quiz-input" + (isCorrect ? " correct" : " incorrect");
+                select.className =
+                  "quiz-select " + (isCorrect ? "correct" : "incorrect");
                 resultSpan.textContent = isCorrect
                   ? "✅"
                   : "❌ (" + answer + ")";
@@ -3908,19 +4014,10 @@
                   quizScore.incorrect++;
                 }
                 updateScore();
-                checkBtn.disabled = true;
-                input.disabled = true;
-              }
-
-              checkBtn.addEventListener("click", checkAnswer);
-              input.addEventListener("keydown", function (e) {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  if (!this.disabled) checkAnswer();
-                }
+                select.disabled = true;
               });
 
-              item._quizData = { input, checkBtn, resultSpan };
+              item._quizData = { select, resultSpan };
             } else {
               const jpSpan = item.querySelector(".jp");
               if (jpSpan && item.dataset.jp) {
