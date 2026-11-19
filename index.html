@@ -576,6 +576,19 @@
         display: none !important;
       }
 
+      /* Grammar cards: these two English bits were not covered by the toggle */
+      .no-translation .grammar-example-en,
+      .no-translation .grammar-meaning {
+        display: none !important;
+      }
+
+      .logo-mark {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        flex: 0 0 auto;
+      }
+
       /* ─── SENTENCES ─── */
       .sentence-grid {
         display: grid;
@@ -847,6 +860,7 @@
     <header class="sticky-header">
       <div class="sticky-header-inner">
         <h1>
+          <img class="logo-mark" src="antonio-mark.png" alt="" width="28" height="28" />
           <span>🇯🇵 日本語リファレンス</span>
           <span class="top-controls">
             <label>
